@@ -137,7 +137,11 @@ func (m *mapper) mapEvent(w *wireEvent, status incident.Status) incident.Record 
 	// The distinction matters: "the vendor published no region" is a real,
 	// alertable platform-wide event, and collapsing it into an empty slice
 	// would let a downstream len()==0 check silently drop total outages.
-	if w.ExtInfos == nil || len(w.ExtInfos) == 0 {
+	//
+	// Both wire shapes land here: a null event_ext_infos decodes to a nil
+	// slice, an empty array to an empty one, and Go treats their lengths
+	// identically. They mean the same thing upstream, so they map the same way.
+	if len(w.ExtInfos) == 0 {
 		r.Global = true
 		m.warn(incident.AnomalyNullScope, "event "+id+" published no region")
 	}

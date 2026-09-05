@@ -599,3 +599,69 @@ func TestNewDefaultsAnEmptyBaseURL(t *testing.T) {
 }
 
 var _ context.Context = context.Background()
+
+// The mainland catalogue is 1661 rows across 13 regions: it passes the row
+// threshold but fails the region one. Checking size before dataset identity
+// would report "truncated" to someone whose base URL lost its path prefix and
+// send them to debug pagination instead of their configuration.
+func TestWrongDatasetIsDiagnosedBeforeSize(t *testing.T) {
+	rows := make([]wireServiceRow, 0, 1700)
+	for i := 0; i < 131; i++ {
+		for r := 0; r < 13; r++ {
+			code := "cn-north-" + string(rune('a'+r))
+			if r == 12 {
+				code = "ap-southeast-3" // one non-mainland region, as upstream has
+			}
+			rows = append(rows, wireServiceRow{RegionCode: code, RegionEN: code, ServiceID: "svc"})
+		}
+	}
+	c := buildCatalogue(rows)
+	if got := len(c.Regions); got >= minCatalogueRegions {
+		t.Fatalf("fixture has %d regions; it must fail the region threshold for this test to mean anything", got)
+	}
+	if c.rows < minCatalogueRows {
+		t.Fatalf("fixture has %d rows; it must PASS the row threshold for this test to mean anything", c.rows)
+	}
+
+	err := c.Validate(false)
+	if !errors.Is(err, incident.ErrWrongDataset) {
+		t.Errorf("got %v, want ErrWrongDataset; the specific diagnosis must win over the size check", err)
+	}
+}
+
+// Running a mainland source alongside the international one is the intended way
+// to exercise this code against a corpus that actually produces incidents. A
+// single region floor calibrated for the international dataset would reject the
+// mainland one as truncated and make that impossible.
+func TestDeliberateMainlandDatasetIsAccepted(t *testing.T) {
+	rows := make([]wireServiceRow, 0, 1700)
+	for i := 0; i < 131; i++ {
+		for r := 0; r < 13; r++ {
+			code := "cn-north-" + string(rune('a'+r))
+			rows = append(rows, wireServiceRow{RegionCode: code, RegionEN: code, ServiceID: "svc"})
+		}
+	}
+	c := buildCatalogue(rows)
+
+	if err := c.Validate(true); err != nil {
+		t.Errorf("a deliberately-selected mainland catalogue must validate, got %v", err)
+	}
+	if err := c.Validate(false); !errors.Is(err, incident.ErrWrongDataset) {
+		t.Errorf("got %v, want ErrWrongDataset without the override", err)
+	}
+}
+
+// The lowered floor must not become a hole: a truncated mainland catalogue is
+// still truncated.
+func TestTruncatedMainlandCatalogueIsStillRejected(t *testing.T) {
+	rows := make([]wireServiceRow, 0, 100)
+	for i := 0; i < 10; i++ {
+		for r := 0; r < 10; r++ {
+			rows = append(rows, wireServiceRow{
+				RegionCode: "cn-north-" + string(rune('a'+r)), RegionEN: "x", ServiceID: "svc"})
+		}
+	}
+	if err := buildCatalogue(rows).Validate(true); !errors.Is(err, incident.ErrSchemaDrift) {
+		t.Errorf("got %v, want ErrSchemaDrift for a short catalogue", err)
+	}
+}

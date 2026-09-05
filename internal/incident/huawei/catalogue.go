@@ -15,8 +15,21 @@ import (
 // watched region may well still be present in that truncated page — checking
 // only "can I find AP-Jakarta?" does NOT catch it. Only the totals do.
 const (
-	minCatalogueRows    = 1200 // 1579 observed
-	minCatalogueRegions = 15   // 17 observed
+	// minCatalogueRows is the primary truncation guard. Truncation shows up as
+	// a round page boundary, so any real catalogue clears this comfortably:
+	// the international dataset is 1579 rows, the mainland one 1661.
+	minCatalogueRows = 1200
+
+	// minCatalogueRegions is a secondary guard and is dataset-dependent.
+	//
+	// The international dataset has 17 regions; the mainland one legitimately
+	// has 13. A single floor of 15 would reject the mainland dataset as
+	// truncated even when it was requested deliberately, which matters because
+	// running a mainland source alongside the international one is the intended
+	// way to exercise this code against a corpus that actually produces
+	// incidents.
+	minCatalogueRegions        = 15
+	minCatalogueRegionsNonIntl = 10
 )
 
 // Catalogue is the region x service inventory.
@@ -79,22 +92,33 @@ func (c *Catalogue) NameFor(code string) (string, bool) {
 }
 
 // Validate asserts the catalogue is whole and is the dataset we expect.
+//
+// The dataset check runs FIRST, before the size checks, because the two
+// failures overlap and the size one is the less useful diagnosis. The mainland
+// catalogue is 1661 rows across 13 regions: it passes the row threshold but
+// fails the region threshold, so checking size first would report "the response
+// was truncated" to someone whose base URL had actually lost its path prefix,
+// and send them to debug pagination instead of their configuration.
 func (c *Catalogue) Validate(allowNonIntl bool) error {
-	if c.rows < minCatalogueRows {
-		return fmt.Errorf("%w: catalogue has %d rows, want at least %d; "+
-			"a short catalogue means the response was truncated and some regions are missing entirely",
-			incident.ErrSchemaDrift, c.rows, minCatalogueRows)
-	}
-	if len(c.Regions) < minCatalogueRegions {
-		return fmt.Errorf("%w: catalogue has %d regions, want at least %d",
-			incident.ErrSchemaDrift, len(c.Regions), minCatalogueRegions)
-	}
 	// A catalogue that is overwhelmingly mainland regions means we are reading
 	// the other site's dataset, which happens silently when the base URL loses
 	// its path prefix.
 	if !allowNonIntl && c.cnRegionFrac > 0.9 {
 		return fmt.Errorf("%w: %.0f%% of regions are mainland; the base URL has probably lost its path prefix",
 			incident.ErrWrongDataset, c.cnRegionFrac*100)
+	}
+	if c.rows < minCatalogueRows {
+		return fmt.Errorf("%w: catalogue has %d rows, want at least %d; "+
+			"a short catalogue means the response was truncated and some regions are missing entirely",
+			incident.ErrSchemaDrift, c.rows, minCatalogueRows)
+	}
+	minRegions := minCatalogueRegions
+	if allowNonIntl {
+		minRegions = minCatalogueRegionsNonIntl
+	}
+	if len(c.Regions) < minRegions {
+		return fmt.Errorf("%w: catalogue has %d regions, want at least %d",
+			incident.ErrSchemaDrift, len(c.Regions), minRegions)
 	}
 	return nil
 }
