@@ -1,0 +1,263 @@
+[
+ {
+  "event_ext_infos": [
+   {
+    "region_id": "80a3ddddad7642319fda0d80adc71d7e",
+    "region_code": "ap-southeast-5",
+    "region_zh_name": "亚太-马尼拉",
+    "region_en_name": "AP-Manila",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   },
+   {
+    "region_id": "39a3faa3b82345d19c4eef681a34ea34",
+    "region_code": "ap-southeast-3",
+    "region_zh_name": "亚太-新加坡",
+    "region_en_name": "AP-Singapore",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   },
+   {
+    "region_id": "3127a8264f444e4dab92f9596e026043",
+    "region_code": "tr-west-1",
+    "region_zh_name": "土耳其-伊斯坦布尔",
+    "region_en_name": "TR-Istanbul",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   },
+   {
+    "region_id": "aa363e2b859a43e5a89b7d6380550d32",
+    "region_code": "sa-brazil-1",
+    "region_zh_name": "拉美-圣保罗一",
+    "region_en_name": "LA-Sao Paulo1",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   },
+   {
+    "region_id": "ee53e7cabe294be49942a2749d11abc1",
+    "region_code": "ap-southeast-4",
+    "region_zh_name": "亚太-雅加达",
+    "region_en_name": "AP-Jakarta",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   },
+   {
+    "region_id": "43df3c83065145b093427a932dfdd11e",
+    "region_code": "la-south-2",
+    "region_zh_name": "拉美-圣地亚哥",
+    "region_en_name": "LA-Santiago",
+    "impacted_services": [
+     {
+      "service_id": "88ea0144e8dc4fb58c07315998014670",
+      "service_zh_name": "统一身份认证服务",
+      "service_en_name": "Identity and Access Management",
+      "service_abbr": "IAM"
+     },
+     {
+      "service_id": "faf56f78368149328f418a6e4420cd7a",
+      "service_zh_name": "弹性云服务器",
+      "service_en_name": "Elastic Cloud Server",
+      "service_abbr": "ECS"
+     },
+     {
+      "service_id": "3314bb51bd17406cbbcf953e401f7036",
+      "service_zh_name": "弹性负载均衡",
+      "service_en_name": "Elastic Load Balance",
+      "service_abbr": "ELB"
+     },
+     {
+      "service_id": "d2e231bd764244c49dc63ae1e2978c61",
+      "service_zh_name": "弹性公网IP",
+      "service_en_name": "Elastic IP",
+      "service_abbr": "EIP"
+     }
+    ]
+   }
+  ],
+  "event_id": 13,
+  "event_level": 2,
+  "event_type": 1,
+  "desc_zh": "2026年7月26日（北京时间）亚太-雅加达、中国-香港、亚太-马尼拉、拉美-圣保罗一、土耳其-伊斯坦布尔区域华为云账号异常通知",
+  "desc_en": "",
+  "event_occur_time": "2026-07-25T19:05:00Z",
+  "last_update_time": "2026-07-27T00:04:52Z",
+  "has_report": false,
+  "event_progress": [
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前工程师正在紧急修复，建议您尽快检查业务情况。相关进展我们会第一时间通知您。\n       如您有任何问题，可随时通过工单或者服务热线（4000-955-988或950808）与我们联系\n        感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T19:05:00Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前已控制住影响范围，紧急修复中。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T19:39:52Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问。目前工程师仍在紧急修复中，请您稍后重试。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T20:16:47Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前恢复方案已确定，正在紧急修复中，请您稍后重试。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T21:07:37Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前正在逐步恢复中，请您稍后重试。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T21:47:31Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n 2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前在持续恢复中，请您稍后重试。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-25T23:04:49Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前已执行批量恢复操作，加速恢复中，请您稍后重试。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-26T01:21:40Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前主体故障已恢复，部分长尾问题还在持续处理。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-26T02:15:22Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前大部分业务已恢复，少量问题仍在持续消除中，建议您尽快检查业务情况。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-26T07:17:00Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，目前数据面业务已恢复，部分云服务实例资源状态显示问题正在修复中，建议您尽快检查业务情况。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-26T10:51:09Z"
+   },
+   {
+    "progress_zh": "尊敬的华为云客户：\n      2026/7/26  02:49（北京时间），华为云监测发现华为云国际站账号存在异常，可能影响您相关云服务的访问，截止2026/7/27 05:06（北京时间），Console页面订单和实例展示问题已修复，建议您检查业务运行情况。\n      如您有任何问题，可随时通过工单与我们联系。\n      感谢您对华为云的支持！",
+    "progress_en": "",
+    "progress_occur_time": "2026-07-26T23:29:00Z"
+   }
+  ]
+ }
+]

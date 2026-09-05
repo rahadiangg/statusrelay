@@ -112,6 +112,17 @@ const (
 	AnomalyCountMismatch      = "count_mismatch"
 )
 
+// Region is one region in a provider's inventory.
+//
+// The inventory says what EXISTS, not what is working: these providers publish
+// no per-service health, and their own green-tick grids are a client-side
+// projection of published incidents onto this list. Nothing downstream may
+// derive a health signal from a Region.
+type Region struct {
+	Code string
+	Name string
+}
+
 // Key identifies a record globally.
 //
 // ProviderID is a string even where the upstream uses an integer: this upstream
