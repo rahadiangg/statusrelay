@@ -1,0 +1,10 @@
+/statwatch
+/statwatchctl
+/dist/
+coverage.out
+*.test
+state.json
+state.json.bak
+targets.json
+.env
+.DS_Store
