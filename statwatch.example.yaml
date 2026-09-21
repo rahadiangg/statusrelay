@@ -1,0 +1,66 @@
+# statwatch configuration.
+#
+# Every key is validated at startup; an unknown or misspelt key is an error,
+# not a silently ignored line. Durations need a unit (60s, 15m, 1h).
+# Secrets are never written here: each *_env key names an environment
+# variable that holds the value.
+
+poll_interval: 60s          # how often each source is fetched; floor 10s (faster invites a WAF block)
+fetch_timeout: 45s          # bound on one fetch, one self-check, one notifier delivery
+self_check_interval: 1h     # how often the source proves its feed is still truthful
+stale_after: 15m            # no complete snapshot for this long => "SOURCE BLIND" alert
+vanish_grace: 3             # complete snapshots an open incident must be absent from before it is inferred resolved
+state_file: /var/lib/statwatch/state.json   # relative paths resolve against the working directory
+dev_log: false              # true: human-readable debug logs; false: JSON at info
+
+sources:
+  - id: huawei-intl
+    kind: huawei
+    # base_url defaults to https://status.service.huaweicloud.com/intl
+    # The trailing /intl is load-bearing: without it the same host serves
+    # the China-mainland dataset at HTTP 200.
+    # mirror_url defaults to the .cn edge of the same dataset; "none" disables failover.
+    regions:
+      # Region CODES, not names, decide what you monitor. AP-Jakarta is
+      # ap-southeast-4; ap-southeast-3 is AP-Singapore. A wrong code
+      # monitors the wrong country forever and reports healthy. Giving the
+      # name too makes statwatch verify the pairing against the live
+      # catalogue at startup and refuse to run on a mismatch.
+      - {code: ap-southeast-4, name: AP-Jakarta}
+    # all_regions: true          # instead of a regions list; must be explicit
+    # services: [ECS, IAM, ELB]  # optional: only these service abbreviations
+    include_global: true        # alert on events the provider publishes with no region at all
+    min_severity: info          # info | minor | major | critical; unknown severities always alert
+    prefer_lang: en             # en | zh; falls back to the other when empty upstream
+    allow_non_intl: false       # true only when deliberately watching the mainland site
+
+notify:
+  # log_only: true    # first deploy / dry run: events are logged, nobody is paged
+  retry:
+    attempts: 3       # total tries per delivery
+    backoff: 2s       # doubles each retry; a 429's retry-after overrides it
+  telegram:
+    - name: oncall
+      chat_id: "-1001234567890"     # numeric id or @channelusername; quote negative ids
+      token_env: STATWATCH_TELEGRAM_TOKEN
+      # thread_id: 42               # forum topic inside a supergroup
+  smtp:
+    - name: ops
+      addr: smtp.example.com:587    # STARTTLS is used when the relay offers it
+      from: "StatWatch <statwatch@example.com>"
+      to: ["On Call <oncall@example.com>"]
+      username: statwatch@example.com
+      password_env: STATWATCH_SMTP_PASSWORD
+  webhook:
+    - name: n8n
+      url: https://hooks.example.com/statwatch   # redirects are refused; give the final URL
+      secret_env: STATWATCH_WEBHOOK_SECRET       # X-Statwatch-Signature: sha256=<hmac of body>
+      headers:
+        Authorization: "Bearer replace-me"
+
+# Seeing a delivery without waiting for a real incident:
+#   1. run with notify.log_only: true once; state_file is written and history
+#      is NOT alerted (cold start only reports what is currently open).
+#   2. stop, edit state_file: change one record's "Status" from 1 (resolved)
+#      to 0 (open), set log_only back to false, start again.
+#   3. the next poll sees it in the resolved list and delivers a RESOLVED event.

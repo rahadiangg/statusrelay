@@ -1,0 +1,41 @@
+poll_interval: 30s
+fetch_timeout: 20s
+self_check_interval: 2h
+stale_after: 10m
+vanish_grace: 5
+state_file: /var/lib/statwatch/state.json
+dev_log: true
+
+sources:
+  - id: huawei-intl
+    kind: huawei
+    base_url: https://status.service.huaweicloud.com/intl
+    mirror_url: https://status.service.huaweicloud.cn/intl
+    regions:
+      - {code: ap-southeast-4, name: AP-Jakarta}
+      - {code: ap-southeast-3, name: AP-Singapore}
+    services: [ecs, " iam "]
+    include_global: false
+    min_severity: major
+    prefer_lang: zh
+    allow_non_intl: false
+  - id: huawei-all
+    kind: huawei
+    all_regions: true
+
+notify:
+  retry: {attempts: 5, backoff: 1s}
+  telegram:
+    - {name: oncall, chat_id: "-100123", token_env: TG_TOKEN, thread_id: 42}
+  smtp:
+    - name: ops
+      addr: smtp.example.com:587
+      from: "StatWatch <bot@example.com>"
+      to: [a@example.com, b@example.com]
+      username: bot
+      password_env: SMTP_PW
+  webhook:
+    - name: n8n
+      url: https://hooks.example.com/x
+      secret_env: HOOK_SECRET
+      headers: {Authorization: "Bearer abc"}

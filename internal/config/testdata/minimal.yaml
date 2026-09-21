@@ -1,0 +1,7 @@
+sources:
+  - id: huawei-intl
+    kind: huawei
+    regions:
+      - code: ap-southeast-4
+notify:
+  log_only: true

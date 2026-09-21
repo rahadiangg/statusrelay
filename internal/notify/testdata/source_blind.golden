@@ -1,0 +1,12 @@
+Subject: [statwatch] SOURCE BLIND critical: statwatch cannot see huawei-intl (no complete snapshot for 16m0s)
+
+SOURCE BLIND · critical · huawei-intl #statwatch
+statwatch cannot see huawei-intl (no complete snapshot for 16m0s)
+Status: open
+Published: 2026-09-21 10:14 UTC
+Regions: global (no region published)
+
+Update 2026-09-21 10:30 UTC:
+  fetching open incidents: incident: upstream request failed: dial tcp: i/o timeout
+
+Until this recovers, "no incidents" means nothing: the feed is not being read. Check the provider site by hand.

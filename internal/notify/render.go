@@ -37,6 +37,8 @@ var kindLabels = map[incident.EventKind]string{
 	incident.KindUpdatedAfterResolve: "POST-MORTEM UPDATE",
 	incident.KindVanished:            "VANISHED (not resolved)",
 	incident.KindScopeExited:         "LEFT WATCHED SCOPE",
+	KindSourceBlind:                  "SOURCE BLIND",
+	KindSourceRecovered:              "SOURCE RECOVERED",
 }
 
 // Render produces the message for one event.
@@ -82,6 +84,9 @@ func Render(ev incident.Event) Message {
 	}
 	if ev.Kind == incident.KindVanished {
 		b.WriteString("\nThe provider stopped listing this incident without marking it resolved. Treat it as still open until confirmed.\n")
+	}
+	if ev.Kind == KindSourceBlind {
+		b.WriteString("\nUntil this recovers, \"no incidents\" means nothing: the feed is not being read. Check the provider site by hand.\n")
 	}
 	if ev.ColdStart {
 		b.WriteString("\nFirst run: this may have started before statwatch did.\n")
