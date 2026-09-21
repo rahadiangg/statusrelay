@@ -11,7 +11,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/rahadiangg/statwatch/internal/config"
+	"github.com/rahadiangg/statwatch/internal/httpapi"
+	"github.com/rahadiangg/statwatch/internal/metrics"
 	"github.com/rahadiangg/statwatch/internal/platform/clock"
 	"github.com/rahadiangg/statwatch/internal/platform/logging"
 	"github.com/rahadiangg/statwatch/internal/poller"
@@ -69,13 +73,57 @@ func run(args []string) int {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	reg := prometheus.NewRegistry()
+	rec := metrics.New(reg, version, commit)
+	rec.Init(sourceIDs(cfg), sinkNames(sinks))
+	opts := pollerOptions(cfg, clk, log)
+	opts.Observer = rec
+	p := poller.New(sources, sinks, store.New(cfg.StateFile, clk), opts)
+
+	// The listener binds before the loop starts, so a port clash is a
+	// startup failure rather than a watcher that runs unscraped.
+	httpErr := make(chan error, 1)
+	if cfg.HTTP.Listen == "" {
+		log.Warn("http.listen is empty: no /metrics, /healthz or /readyz")
+	} else {
+		th := httpapi.Thresholds{LoopStale: httpapi.LoopStaleFor(cfg.PollInterval, cfg.FetchTimeout, len(sinks)), Clock: clk}
+		srv := httpapi.New(cfg.HTTP.Listen, reg, p.Health, th, log)
+		if err := srv.Listen(); err != nil {
+			log.Error("http", "err", err)
+			return 2
+		}
+		go func() { httpErr <- srv.Serve(ctx) }()
+	}
+
 	log.Info("starting", "version", version, "config", path, "state_file", cfg.StateFile,
-		"sources", len(sources), "sinks", len(sinks), "poll_interval", cfg.PollInterval)
-	p := poller.New(sources, sinks, store.New(cfg.StateFile, clk), pollerOptions(cfg, clk, log))
+		"sources", len(sources), "sinks", len(sinks), "poll_interval", cfg.PollInterval, "http", cfg.HTTP.Listen)
+	code := 0
 	if err := p.Run(ctx); err != nil {
 		log.Error("fatal", "err", err)
-		return 1
+		code = 1
+	}
+	stop()
+	if cfg.HTTP.Listen != "" {
+		if err := <-httpErr; err != nil {
+			log.Error("http", "err", err)
+		}
 	}
 	log.Info("stopped")
-	return 0
+	return code
+}
+
+func sourceIDs(cfg config.Config) []string {
+	out := make([]string, len(cfg.Sources))
+	for i, s := range cfg.Sources {
+		out[i] = s.ID
+	}
+	return out
+}
+
+func sinkNames(sinks []poller.Sink) []string {
+	out := make([]string, len(sinks))
+	for i, s := range sinks {
+		out[i] = s.Name()
+	}
+	return out
 }

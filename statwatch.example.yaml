@@ -34,6 +34,10 @@ sources:
     prefer_lang: en             # en | zh; falls back to the other when empty upstream
     allow_non_intl: false       # true only when deliberately watching the mainland site
 
+http:
+  listen: ":9101"           # /metrics (Prometheus), /healthz (liveness), /readyz (503 while any source is blind). "" disables.
+                            # No auth, no TLS, no incident text: counts and timestamps only. Bind to loopback if in doubt.
+
 notify:
   # log_only: true    # first deploy / dry run: events are logged, nobody is paged
   retry:

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -118,5 +119,35 @@ func TestRunExitCodes(t *testing.T) {
 	}
 	if code := run([]string{"-config", bad}); code != 2 {
 		t.Errorf("invalid config: got %d, want 2", code)
+	}
+}
+
+func TestRunExitsWhenPortIsTaken(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = ln.Close() }()
+	cfg := filepath.Join(t.TempDir(), "c.yaml")
+	body := "http: {listen: \"" + ln.Addr().String() + "\"}\nstate_file: " + filepath.Join(t.TempDir(), "s.json") +
+		"\nsources: [{id: a, kind: huawei, all_regions: true, base_url: \"http://127.0.0.1:1/intl\", mirror_url: none}]\nnotify: {log_only: true}\n"
+	if err := os.WriteFile(cfg, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// The listener is bound before the poller starts, so this returns
+	// without ever touching the (unreachable) source.
+	if code := run([]string{"-config", cfg}); code != 2 {
+		t.Errorf("port taken: got %d, want 2", code)
+	}
+}
+
+func TestSourceIDsAndSinkNames(t *testing.T) {
+	cfg := fullConfig(t)
+	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror" {
+		t.Errorf("sourceIDs: %s", got)
+	}
+	sinks, _ := buildSinks(cfg, clock.NewFake(testEpoch), "x")
+	if got := strings.Join(sinkNames(sinks), ","); got != "telegram/tg,smtp/mail,webhook/hook" {
+		t.Errorf("sinkNames: %s", got)
 	}
 }

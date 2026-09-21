@@ -102,6 +102,21 @@ func TestParseMinimalAppliesDefaults(t *testing.T) {
 	if cfg.Sources[0].RegionNames() != nil {
 		t.Error("unnamed regions must yield nil names, not empty strings")
 	}
+	if cfg.HTTP.Listen != ":9101" {
+		t.Errorf("http.listen default %q, want :9101", cfg.HTTP.Listen)
+	}
+}
+
+func TestHTTPListenForms(t *testing.T) {
+	for _, tc := range []struct{ name, listen string }{
+		{"disabled", `""`}, {"port only", `":9101"`}, {"loopback", `"127.0.0.1:9101"`}, {"ipv6", `"[::1]:9101"`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if _, err := Parse(strings.NewReader("http: {listen: "+tc.listen+"}\n"+validSource+"notify: {log_only: true}"), env(nil)); err != nil {
+				t.Errorf("listen %s rejected: %v", tc.listen, err)
+			}
+		})
+	}
 }
 
 func TestParseEmptyDocument(t *testing.T) {
@@ -161,6 +176,8 @@ func TestParseRejects(t *testing.T) {
 		{name: "smtp password without username", yaml: validSource + "notify: {smtp: [{name: a, addr: 'h:25', from: a@b.c, to: [x@y.z], password_env: P}]}", env: map[string]string{"P": "p"}, want: "set together"},
 		{name: "smtp missing to", yaml: validSource + "notify: {smtp: [{name: a, addr: 'h:25', from: a@b.c}]}", want: "addr, from and to"},
 		{name: "webhook missing url", yaml: validSource + "notify: {webhook: [{name: a}]}", want: "url is required"},
+		{name: "http.listen without port", yaml: "http: {listen: localhost}\n" + validSource + "notify: {log_only: true}", want: "http.listen"},
+		{name: "http.listen garbage", yaml: "http: {listen: 'a:b:c'}\n" + validSource + "notify: {log_only: true}", want: "http.listen"},
 		{name: "env poll override unparsable", yaml: validSource + "notify: {log_only: true}", env: map[string]string{EnvPollInterval: "soon"}, want: EnvPollInterval},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

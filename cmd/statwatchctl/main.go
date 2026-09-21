@@ -67,6 +67,11 @@ func checkConfig(args []string, stdout, stderr io.Writer, getenv func(string) st
 	fmt.Fprintf(stdout, "poll every %s, fetch timeout %s, self-check every %s, blind after %s, vanish grace %d\n",
 		cfg.PollInterval, cfg.FetchTimeout, cfg.SelfCheckInterval, cfg.StaleAfter, cfg.VanishGrace)
 	fmt.Fprintf(stdout, "state file: %s\n", cfg.StateFile)
+	if cfg.HTTP.Listen == "" {
+		fmt.Fprintln(stdout, "http: DISABLED — no /metrics, /healthz, /readyz")
+	} else {
+		fmt.Fprintf(stdout, "http: %s (/metrics /healthz /readyz)\n", cfg.HTTP.Listen)
+	}
 	for _, s := range cfg.Sources {
 		regions := "ALL regions"
 		if !s.AllRegions {

@@ -16,6 +16,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,6 +39,13 @@ type Config struct {
 
 	Sources []Source `yaml:"sources"`
 	Notify  Notify   `yaml:"notify"`
+	HTTP    HTTP     `yaml:"http"`
+}
+
+// HTTP configures the metrics/probe listener.
+type HTTP struct {
+	// Listen is host:port. Empty disables the listener entirely.
+	Listen string `yaml:"listen"`
 }
 
 // Source is one status feed instance.
@@ -124,6 +132,7 @@ func defaults() Config {
 		VanishGrace:       3,
 		StateFile:         "statwatch-state.json",
 		Notify:            Notify{Retry: Retry{Attempts: 3, Backoff: 2 * time.Second}},
+		HTTP:              HTTP{Listen: ":9101"},
 	}
 }
 
@@ -253,6 +262,11 @@ func (c *Config) validate() error {
 
 	if err := c.Notify.validate(); err != nil {
 		errs = append(errs, err)
+	}
+	if c.HTTP.Listen != "" {
+		if _, _, err := net.SplitHostPort(c.HTTP.Listen); err != nil {
+			bad("http.listen %q must be host:port (use \"\" to disable): %v", c.HTTP.Listen, err)
+		}
 	}
 
 	if len(errs) == 0 {

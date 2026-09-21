@@ -89,6 +89,7 @@ func TestCheckConfigDescribesEverything(t *testing.T) {
 		"telegram/tg: chat 1, token from $T (3 chars)",
 		"smtp/mail: h:587", "password from $P",
 		"webhook/hook: https://example.com/h, signed with $S",
+		"http: :9101 (/metrics",
 	} {
 		if !strings.Contains(out.String(), want) {
 			t.Errorf("output lacks %q:\n%s", want, out.String())
