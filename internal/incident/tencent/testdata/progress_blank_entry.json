@@ -1,0 +1,45 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "ProgressList": [
+        {
+          "ProgressCode": "b37c3fcef429bebf302bb3bfe7a280a8",
+          "OccurTime": "2026-04-21 20:10:00",
+          "Status": 1,
+          "Content": "We are pleased to inform you that the cooling system at the affected data center has been fully repaired and all equipment has been successfully powered back on. All services have now been fully restored.\n\nWe recommend that you verify your business operations at your earliest convenience. Should you have any questions or require further assistance, please do not hesitate to contact us."
+        },
+        {
+          "ProgressCode": "e815617d6b8a7b4012b7cbe17c67ebfc",
+          "OccurTime": "2026-04-21 16:45:00",
+          "Status": 2,
+          "Content": "The cooling system at the affected data center remains under repair. We are continuing to selectively power down certain equipment to prevent further temperature escalation.\n\nShould you have any questions, please do not hesitate to contact us. We will keep you informed as soon as there are further updates"
+        },
+        {
+          "ProgressCode": "be49a889b548aa9b00e93d12649fef1e",
+          "OccurTime": "2026-04-21 15:38:00",
+          "Status": 2,
+          "Content": "The cooling system at the affected data center is currently still under repair. As part of our mitigation efforts, we are selectively powering down certain equipment to protect the overall facility infrastructure. Concurrently, we are executing failover operations for services that meet the criteria for disaster recovery switching. Our teams are making every effort to minimize the duration of this incident.\nWe expect to provide the next progress update within 30 minutes. Should you have any questions or require further assistance, please do not hesitate to contact us."
+        },
+        {
+          "ProgressCode": "f28d2760314b7f0eda09d0b35fd335a1",
+          "OccurTime": "2026-04-21 13:38:00",
+          "Status": 2,
+          "Content": "Dear customer: Tencent Cloud detected some abnormal CVM problems in Seoul Zone 2. We have launched an emergency plan and are investigating and repairing problems. We will expect to provide the next progress update in 30 minutes. If you have any questions, please feel free to contact us."
+        },
+        {
+          "ProgressCode": "dd7eeb9aa04d447fb21062b70e8152eb",
+          "OccurTime": "2026-04-21 13:38:00",
+          "Status": 2,
+          "Content": "Dear Valued Customer,\nWe are writing to inform you that Tencent Cloud has detected an issue affecting a subset of Lighthouse instances in Seoul Zone 2.\nOur emergency response plan has been activated, and our technical teams are actively investigating and working to resolve the issue. We expect to provide the next progress update within 30 minutes.\nShould you have any questions or require further assistance, please do not hesitate to contact us."
+        },
+        {
+          "ProgressCode": "x",
+          "OccurTime": "2026-04-21 21:00:00",
+          "Status": 1,
+          "Content": "  "
+        }
+      ]
+    }
+  }
+}

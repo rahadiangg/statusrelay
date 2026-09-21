@@ -7,6 +7,7 @@ import (
 	"github.com/rahadiangg/statwatch/internal/config"
 	"github.com/rahadiangg/statwatch/internal/incident"
 	"github.com/rahadiangg/statwatch/internal/incident/huawei"
+	"github.com/rahadiangg/statwatch/internal/incident/tencent"
 	"github.com/rahadiangg/statwatch/internal/notify"
 	"github.com/rahadiangg/statwatch/internal/notify/smtp"
 	"github.com/rahadiangg/statwatch/internal/notify/telegram"
@@ -41,6 +42,27 @@ func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger) ([]incid
 				opts = append(opts, huawei.WithMirror(sc.MirrorURL))
 			}
 			s, err := huawei.New(sc.ID, sc.BaseURL, opts...)
+			if err != nil {
+				return nil, fmt.Errorf("source %s: %w", sc.ID, err)
+			}
+			out = append(out, s)
+		case "tencent":
+			// The shared Source struct carries knobs this adapter has no use
+			// for. Refusing them beats ignoring them: an operator who set
+			// prefer_lang: zh and got English forever would never learn why.
+			switch {
+			case sc.MirrorURL != "" && sc.MirrorURL != "none":
+				return nil, fmt.Errorf("source %s: mirror_url is not supported by kind tencent", sc.ID)
+			case sc.PreferLang != "en":
+				return nil, fmt.Errorf("source %s: prefer_lang %q is not supported by kind tencent (only en)", sc.ID, sc.PreferLang)
+			case sc.AllowNonIntl:
+				return nil, fmt.Errorf("source %s: allow_non_intl is not supported by kind tencent", sc.ID)
+			}
+			s, err := tencent.New(sc.ID, sc.BaseURL,
+				tencent.WithRegions(sc.RegionCodes(), sc.RegionNames()),
+				tencent.WithLogger(log.With("source", sc.ID)),
+				tencent.WithClock(clk),
+			)
 			if err != nil {
 				return nil, fmt.Errorf("source %s: %w", sc.ID, err)
 			}

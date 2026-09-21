@@ -110,6 +110,7 @@ const (
 	AnomalyUnknownSeverity    = "unknown_severity"
 	AnomalySilentMtimeBump    = "silent_mtime_bump"
 	AnomalyCountMismatch      = "count_mismatch"
+	AnomalyUnknownStatus      = "unknown_status"
 )
 
 // Region is one region in a provider's inventory.

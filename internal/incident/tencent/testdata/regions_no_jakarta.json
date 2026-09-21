@@ -1,0 +1,130 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "AreaDetailList": [
+        {
+          "AreaName": "America",
+          "RegionList": [
+            {
+              "RegionName": "Virginia",
+              "RegionId": "na-ashburn",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Silicon Valley",
+              "RegionId": "na-siliconvalley",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Sao Paulo",
+              "RegionId": "sa-saopaulo",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "Asia",
+          "RegionList": [
+            {
+              "RegionName": "Bangkok",
+              "RegionId": "ap-bangkok",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Seoul",
+              "RegionId": "ap-seoul",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Singapore",
+              "RegionId": "ap-singapore",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Tokyo",
+              "RegionId": "ap-tokyo",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "China",
+          "RegionList": [
+            {
+              "RegionName": "Beijing",
+              "RegionId": "ap-beijing",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Chengdu",
+              "RegionId": "ap-chengdu",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Chongqing",
+              "RegionId": "ap-chongqing",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Guangzhou",
+              "RegionId": "ap-guangzhou",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Hong Kong",
+              "RegionId": "ap-hongkong",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Nanjing",
+              "RegionId": "ap-nanjing",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Shanghai",
+              "RegionId": "ap-shanghai",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "Europe",
+          "RegionList": [
+            {
+              "RegionName": "Frankfurt",
+              "RegionId": "eu-frankfurt",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "Middle East",
+          "RegionList": [
+            {
+              "RegionName": "Riyadh",
+              "RegionId": "me-saudi-arabia",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "Non-Regional",
+          "RegionList": [
+            {
+              "RegionName": "Non-Regional",
+              "RegionId": "non-regional",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        }
+      ]
+    }
+  }
+}

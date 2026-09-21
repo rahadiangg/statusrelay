@@ -29,6 +29,10 @@ sources:
     all_regions: true
     mirror_url: none
     min_severity: major
+  - id: tencent-intl
+    kind: tencent
+    regions: [{code: ap-jakarta, name: Jakarta}]
+    services: [cvm]
 notify:
   retry: {attempts: 2, backoff: 1s}
   telegram: [{name: tg, chat_id: "1", token_env: T}]
@@ -47,8 +51,36 @@ func TestBuildSources(t *testing.T) {
 	if err != nil {
 		t.Fatalf("buildSources: %v", err)
 	}
-	if len(srcs) != 2 || srcs[0].ID() != "huawei-intl" || srcs[0].Kind() != "huawei" || srcs[1].ID() != "huawei-nomirror" {
+	if len(srcs) != 3 || srcs[0].ID() != "huawei-intl" || srcs[0].Kind() != "huawei" || srcs[1].ID() != "huawei-nomirror" ||
+		srcs[2].ID() != "tencent-intl" || srcs[2].Kind() != "tencent" {
 		t.Errorf("got %d sources: %v", len(srcs), srcs)
+	}
+
+	// Knobs the tencent adapter cannot honour are refused, not ignored.
+	for _, tc := range []struct {
+		name string
+		set  func(*config.Source)
+		want string
+	}{
+		{"mirror_url", func(s *config.Source) { s.MirrorURL = "https://example.com" }, "mirror_url"},
+		{"mirror_url none is fine", func(s *config.Source) { s.MirrorURL = "none" }, ""},
+		{"prefer_lang", func(s *config.Source) { s.PreferLang = "zh" }, "prefer_lang"},
+		{"allow_non_intl", func(s *config.Source) { s.AllowNonIntl = true }, "allow_non_intl"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := fullConfig(t)
+			tc.set(&c.Sources[2])
+			_, err := buildSources(c, clock.NewFake(testEpoch), slog.Default())
+			if tc.want == "" {
+				if err != nil {
+					t.Fatalf("got %v, want nil", err)
+				}
+				return
+			}
+			if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Errorf("got %v, want error naming %s", err, tc.want)
+			}
+		})
 	}
 
 	cfg.Sources[0].Kind = "aws"
@@ -97,8 +129,11 @@ func TestBuildFiltersAndOptions(t *testing.T) {
 	if len(f["huawei-nomirror"].Regions) != 0 || f["huawei-nomirror"].MinSeverity != incident.SeverityMajor {
 		t.Errorf("filter wrong: %+v", f["huawei-nomirror"])
 	}
+	if !f["tencent-intl"].Regions["ap-jakarta"] || !f["tencent-intl"].Services["CVM"] {
+		t.Errorf("filter wrong: %+v", f["tencent-intl"])
+	}
 	o := pollerOptions(cfg, clock.NewFake(testEpoch), slog.Default())
-	if o.Interval != cfg.PollInterval || o.VanishGrace != cfg.VanishGrace || len(o.Filters) != 2 || o.Clock == nil {
+	if o.Interval != cfg.PollInterval || o.VanishGrace != cfg.VanishGrace || len(o.Filters) != 3 || o.Clock == nil {
 		t.Errorf("options wrong: %+v", o)
 	}
 }
@@ -143,7 +178,7 @@ func TestRunExitsWhenPortIsTaken(t *testing.T) {
 
 func TestSourceIDsAndSinkNames(t *testing.T) {
 	cfg := fullConfig(t)
-	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror" {
+	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror,tencent-intl" {
 		t.Errorf("sourceIDs: %s", got)
 	}
 	sinks, _ := buildSinks(cfg, clock.NewFake(testEpoch), "x")

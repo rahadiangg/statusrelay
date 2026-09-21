@@ -235,8 +235,10 @@ func (c *Config) validate() error {
 			bad("%s: duplicate id", where)
 		}
 		ids[s.ID] = true
-		if s.Kind != "huawei" {
-			bad("%s: unknown kind %q (supported: huawei)", where, s.Kind)
+		switch s.Kind {
+		case "huawei", "tencent":
+		default:
+			bad("%s: unknown kind %q (supported: huawei, tencent)", where, s.Kind)
 		}
 		if err := s.validateRegions(); err != nil {
 			bad("%s: %v", where, err)

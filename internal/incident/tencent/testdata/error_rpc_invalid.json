@@ -1,0 +1,9 @@
+{
+    "Response": {
+        "Error": {
+            "Code": "InternalError",
+            "Message": "service handle: rpc name /v1/api/ops/DescribeNothing invalid, current service:trpc.tchd.dashboard.HttpApi"
+        },
+        "RequestId": "8ed74ea8-84f1-4218-a34c-90b3607eb9f3"
+    }
+}

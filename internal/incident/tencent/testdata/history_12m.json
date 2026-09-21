@@ -1,0 +1,184 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "Total": 5,
+      "List": [
+        {
+          "EventCode": "93a75460e1115154b8cad11828c34ba7",
+          "Title": "Problems with Cloud Block Storage etc. detected in Seoul",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "2026-04-21 20:10:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "8649c64bb761ad90b7944eeef1e279b6",
+          "Title": "Problems with Anti-DDoS detected ",
+          "StartTime": "2026-01-23 10:42:18",
+          "EndTime": "2026-01-23 10:50:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-01-23 11:03:17",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-01-23 13:30:33",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1142463",
+          "ProductList": [
+            {
+              "ProductId": "ddos",
+              "ProductName": "Anti-DDoS"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "non-regional",
+              "RegionName": "Non-Regional"
+            }
+          ],
+          "TimeRegion": ""
+        },
+        {
+          "EventCode": "c635650cb610f484ec29e59067dc8e90",
+          "Title": "Problems with Cloud Virtual Machine detected in Shanghai",
+          "StartTime": "2026-01-21 12:15:15",
+          "EndTime": "2026-01-21 12:15:15",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-01-21 14:14:27",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-01-21 14:18:41",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1142384",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-shanghai",
+              "RegionName": "Shanghai"
+            }
+          ],
+          "TimeRegion": "Asia/Shanghai"
+        },
+        {
+          "EventCode": "fd61b1ba7f89c71616cd35df88a7c555",
+          "Title": "Problems with Tencent Cloud AI Digital Human detected in Guangzhou",
+          "StartTime": "2025-10-17 08:53:00",
+          "EndTime": "2025-10-17 10:00:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2025-10-17 09:17:00",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2025-10-17 10:13:04",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1138982",
+          "ProductList": [
+            {
+              "ProductId": "ivh",
+              "ProductName": "Tencent Cloud AI Digital Human"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-guangzhou",
+              "RegionName": "Guangzhou"
+            }
+          ],
+          "TimeRegion": "Asia/Shanghai"
+        },
+        {
+          "EventCode": "4cf006e065d54f06f8e651417c8b12a9",
+          "Title": "Problems with Cloud Data Warehouse etc. detected in Virginia",
+          "StartTime": "2025-10-15 11:05:40",
+          "EndTime": "2025-10-15 13:40:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2025-10-15 11:39:41",
+          "UpdateBy": "jessiejsun",
+          "UpdateTime": "2025-10-15 15:05:05",
+          "IsEnable": true,
+          "DotStatus": 2,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1138921",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "trocket",
+              "ProductName": "TDMQ for RocketMQ"
+            },
+            {
+              "ProductId": "vpc",
+              "ProductName": "Virtual Private Cloud"
+            },
+            {
+              "ProductId": "emr",
+              "ProductName": "Elastic MapReduce"
+            },
+            {
+              "ProductId": "cdwch",
+              "ProductName": "Cloud Data Warehouse"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "na-ashburn",
+              "RegionName": "Virginia"
+            }
+          ],
+          "TimeRegion": "America/New_York"
+        }
+      ]
+    }
+  }
+}

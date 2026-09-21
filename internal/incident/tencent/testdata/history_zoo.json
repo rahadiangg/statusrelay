@@ -1,0 +1,617 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "Total": 16,
+      "List": [
+        {
+          "EventCode": "0000000000000000000000000000ab00",
+          "Title": "info notice",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 0,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab01",
+          "Title": "string status",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": "2",
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab02",
+          "Title": "unknown status",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 7,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab03",
+          "Title": "exercise ongoing",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": true,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab04",
+          "Title": "exercise resolved",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "2026-04-21 20:10:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": true,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab05",
+          "Title": "",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "2026-04-21 20:10:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "",
+          "Title": "unkeyed",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab07",
+          "Title": "global only",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "non-regional",
+              "RegionName": "Non-Regional"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab08",
+          "Title": "mixed",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-guangzhou",
+              "RegionName": "Guangzhou"
+            },
+            {
+              "RegionId": "non-regional",
+              "RegionName": "Non-Regional"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab09",
+          "Title": "no regions",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab10",
+          "Title": "bad start",
+          "StartTime": "2026-04-21T13:38:00Z",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab11",
+          "Title": "future",
+          "StartTime": "2027-01-01 00:00:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab12",
+          "Title": "zero duration",
+          "StartTime": "2026-01-21 12:15:15",
+          "EndTime": "2026-01-21 12:15:15",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab13",
+          "Title": "disabled row",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": false,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab14",
+          "Title": "dup",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "2026-04-21 20:10:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        },
+        {
+          "EventCode": "0000000000000000000000000000ab14",
+          "Title": "dup again",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        }
+      ]
+    }
+  }
+}

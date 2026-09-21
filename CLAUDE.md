@@ -26,6 +26,10 @@ OTLP, notifiers, dashboard).
   Fingerprint, and the pure Diff/Apply state machine. Imports nothing of ours;
   everything else imports it. Nothing outside it may depend on a concrete adapter.
 - `internal/incident/huawei` — the Huawei SHD adapter.
+- `internal/incident/tencent` — the Tencent Cloud Health Dashboard adapter. Same
+  disease: HTTP 200 + empty for unknown regions/codes; errors arrive as a 200
+  with a `Response.Error` object; `BelongSite` is ignored; timestamps are UTC
+  without a zone marker.
 - `internal/incident/httpx` — hardened HTTP shared by adapters.
 - `internal/incident/canary` — `//go:build live` schema-drift suite.
 - `internal/poller` — the loop, failure accounting, and the sink bus.
