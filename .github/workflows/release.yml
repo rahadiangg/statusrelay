@@ -1,0 +1,87 @@
+# Cut a release from a semver tag: archives for linux/darwin/windows on
+# amd64/arm64, checksums, GitHub release notes, and a multi-arch image on
+# ghcr.io/rahadiangg/statwatch.
+#
+# A tag alone is not enough. The commit must be on main and must pass the
+# same lint/test/build gates as a PR, so a release can never contain what a
+# PR could not merge.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+# Two tags pushed together must not race on the same GHCR floating tags.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # the GitHub release and its assets
+      packages: write   # ghcr.io push
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # changelog needs history; the ancestry guard needs main
+
+      - name: tag must be semver
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          if ! echo "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "FAIL: tag '$tag' is not vMAJOR.MINOR.PATCH[-prerelease]"
+            exit 1
+          fi
+
+      - name: tag must point at a commit on main
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "FAIL: $GITHUB_SHA is not reachable from origin/main; release from main only"
+            exit 1
+          fi
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # The Dockerfile has no RUN on the target platform, so arm64 builds
+      # without emulation; QEMU is registered anyway so a future RUN does not
+      # break the release at the worst possible moment.
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The one thing goreleaser cannot check for us: that the ldflags still
+      # reach the variables the binaries print. If someone renames
+      # main.version, every artifact above says "dev" and nothing else fails.
+      - name: released binary reports the tag
+        run: |
+          bin=$(find dist -type f -path '*linux_amd64*' -name statwatch | head -1)
+          out=$("$bin" -version)
+          echo "$out"
+          case "$out" in
+            "statwatch ${GITHUB_REF_NAME#v} ("*) ;;
+            *) echo "FAIL: expected version ${GITHUB_REF_NAME#v}"; exit 1 ;;
+          esac

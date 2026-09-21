@@ -1,0 +1,6 @@
+# GoReleaser builds from a context holding only Dockerfile and
+# <os>/<arch>/<binary>; this keeps a local `docker build .` from sending the
+# whole tree either.
+*
+!Dockerfile
+!linux/

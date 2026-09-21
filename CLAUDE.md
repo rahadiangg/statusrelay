@@ -19,8 +19,8 @@
 ## Architecture
 
 `cmd/statwatch` polls one or more status-page providers, diffs each observation
-against persisted state, and fans the resulting events out to sinks (Prometheus,
-OTLP, notifiers, dashboard).
+against persisted state, and fans the resulting events out to sinks (Prometheus
+metrics, notifiers).
 
 - `internal/incident` — **the contract package.** Source, Snapshot, Record, Filter,
   Fingerprint, and the pure Diff/Apply state machine. Imports nothing of ours;
@@ -34,7 +34,7 @@ OTLP, notifiers, dashboard).
 - `internal/incident/canary` — `//go:build live` schema-drift suite.
 - `internal/poller` — the loop, failure accounting, and the sink bus.
 - `internal/store` — persistence. `internal/notify` — transports.
-- `internal/metrics`, `internal/otelx`, `internal/httpapi`, `internal/webui`.
+- `internal/metrics` — Prometheus registry. `internal/httpapi` — /metrics, /healthz, /readyz.
 
 Providers are wired by an explicit `buildSources()` in `cmd/statwatch`, not an
 `init()` registry: greppable, no import side effects.

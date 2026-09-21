@@ -3,8 +3,7 @@
 /dist/
 coverage.out
 *.test
-state.json
-state.json.bak
-targets.json
+statwatch-state.json*
+statwatch.yaml
 .env
 .DS_Store
