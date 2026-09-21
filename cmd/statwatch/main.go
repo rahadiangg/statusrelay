@@ -56,7 +56,7 @@ func run(args []string) int {
 	clk := clock.System{}
 	ua := "statwatch/" + version
 
-	sources, err := buildSources(cfg, clk, log)
+	sources, err := buildSources(cfg, clk, log, ua)
 	if err != nil {
 		log.Error("building sources", "err", err)
 		return 2

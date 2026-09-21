@@ -665,3 +665,31 @@ func TestTruncatedMainlandCatalogueIsStillRejected(t *testing.T) {
 		t.Errorf("got %v, want ErrSchemaDrift for a short catalogue", err)
 	}
 }
+
+func TestUserAgentReachesTheUpstream(t *testing.T) {
+	var got string
+	var mu sync.Mutex
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		got = r.Header.Get("User-Agent")
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[]`))
+	}))
+	t.Cleanup(srv.Close)
+
+	// No WithHTTPClient: this is the production construction path, the one
+	// that used to hardcode statwatch/dev regardless of the release.
+	s, err := New("huawei-intl", srv.URL+"/intl",
+		WithUserAgent("statwatch/v1.2.3"),
+		WithClock(clock.NewFake(testEpoch)))
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	_, _ = s.Fetch(t.Context())
+	mu.Lock()
+	defer mu.Unlock()
+	if got != "statwatch/v1.2.3" {
+		t.Errorf("User-Agent: got %q, want %q", got, "statwatch/v1.2.3")
+	}
+}

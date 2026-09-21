@@ -33,6 +33,7 @@ type Source struct {
 	clock  clock.Clock
 
 	allowNonIntl bool
+	userAgent    string
 	regionCodes  []string
 	regionNames  []string
 	preferLang   string
@@ -81,6 +82,12 @@ func WithLevelMap(m map[int64]incident.Severity) Option {
 // WithHTTPClient replaces the HTTP layer. Primarily for tests.
 func WithHTTPClient(d doer) Option { return func(s *Source) { s.client.http = d } }
 
+// WithUserAgent sets the User-Agent sent upstream. Ignored when WithHTTPClient
+// supplies the transport. Without it every release identifies as statwatch/dev,
+// which is useless to whoever reads the upstream's access log when deciding
+// what to block.
+func WithUserAgent(ua string) Option { return func(s *Source) { s.userAgent = ua } }
+
 // New builds a Source. id is the instance name, base is the dataset URL.
 func New(id, base string, opts ...Option) (*Source, error) {
 	if strings.TrimSpace(base) == "" {
@@ -88,7 +95,7 @@ func New(id, base string, opts ...Option) (*Source, error) {
 	}
 	s := &Source{
 		id:     id,
-		client: &client{base: base, http: httpx.New()},
+		client: &client{base: base},
 		log:    slog.Default(),
 		clock:  clock.System{},
 	}
@@ -100,6 +107,13 @@ func New(id, base string, opts ...Option) (*Source, error) {
 	s.selfCheckOK = true
 	for _, o := range opts {
 		o(s)
+	}
+	if s.client.http == nil {
+		var hopts []httpx.Option
+		if s.userAgent != "" {
+			hopts = append(hopts, httpx.WithUserAgent(s.userAgent))
+		}
+		s.client.http = httpx.New(hopts...)
 	}
 	s.mapper = func() *mapper {
 		return &mapper{sourceID: s.id, preferLang: s.preferLang, levels: s.levels}

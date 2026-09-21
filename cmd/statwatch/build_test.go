@@ -43,7 +43,7 @@ notify:
 
 func TestBuildSources(t *testing.T) {
 	cfg := fullConfig(t)
-	srcs, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default())
+	srcs, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statwatch/test")
 	if err != nil {
 		t.Fatalf("buildSources: %v", err)
 	}
@@ -52,7 +52,7 @@ func TestBuildSources(t *testing.T) {
 	}
 
 	cfg.Sources[0].Kind = "aws"
-	if _, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default()); err == nil || !strings.Contains(err.Error(), "aws") {
+	if _, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statwatch/test"); err == nil || !strings.Contains(err.Error(), "aws") {
 		t.Errorf("unknown kind: got %v, want error naming aws", err)
 	}
 }

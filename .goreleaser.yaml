@@ -1,0 +1,91 @@
+# GoReleaser pipeline. Run by .github/workflows/release.yml on a v* tag;
+# `make snapshot` runs it locally with nothing published.
+version: 2
+
+project_name: statwatch
+
+before:
+  hooks:
+    - go mod verify
+
+builds:
+  - id: statwatch
+    main: ./cmd/statwatch
+    binary: statwatch
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.commit={{ .ShortCommit }}
+    # Commit time, not build time, so two builds of one tag are byte-identical.
+    mod_timestamp: "{{ .CommitTimestamp }}"
+  - id: statwatchctl
+    main: ./cmd/statwatchctl
+    binary: statwatchctl
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.commit={{ .ShortCommit }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: default
+    ids: [statwatch, statwatchctl]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - statwatch.example.yaml
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+# One multi-platform build. A tag template that renders empty is skipped,
+# which is how a prerelease (v1.2.0-rc.1) publishes its exact tag without
+# moving :latest, :v1 or :v1.2. The image name is a lowercase literal: GHCR
+# rejects uppercase and repository_owner is not guaranteed to be lowercase.
+dockers_v2:
+  - id: ghcr
+    ids: [statwatch, statwatchctl]
+    dockerfile: Dockerfile
+    images:
+      - ghcr.io/rahadiangg/statwatch
+    platforms: [linux/amd64, linux/arm64]
+    tags:
+      - v{{ .Version }}
+      - "{{ if not .Prerelease }}v{{ .Major }}.{{ .Minor }}{{ end }}"
+      - "{{ if not .Prerelease }}v{{ .Major }}{{ end }}"
+      - "{{ if not .Prerelease }}latest{{ end }}"
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.source: https://github.com/rahadiangg/statwatch
+      org.opencontainers.image.licenses: MIT
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+
+release:
+  github:
+    owner: rahadiangg
+    name: statwatch
+  # A semver prerelease tag (v1.2.0-rc.1) becomes a GitHub prerelease.
+  prerelease: auto
+  draft: false

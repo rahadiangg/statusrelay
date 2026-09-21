@@ -19,7 +19,7 @@ import (
 //
 // No registry, no init(): a grep for "huawei" finds every place the adapter
 // is referenced, and importing this package has no side effects.
-func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger) ([]incident.Source, error) {
+func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger, ua string) ([]incident.Source, error) {
 	out := make([]incident.Source, 0, len(cfg.Sources))
 	for _, sc := range cfg.Sources {
 		switch sc.Kind {
@@ -30,6 +30,7 @@ func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger) ([]incid
 				huawei.WithAllowNonIntl(sc.AllowNonIntl),
 				huawei.WithLogger(log.With("source", sc.ID)),
 				huawei.WithClock(clk),
+				huawei.WithUserAgent(ua),
 			}
 			switch sc.MirrorURL {
 			case "":

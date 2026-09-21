@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # release.yml calls this so a tag can only be released after the same gates
+  # a PR passes. Keep the jobs self-contained: a caller inherits nothing else.
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,6 +44,11 @@ jobs:
       - run: go vet ./...
       - name: test
         run: go test ./... -race -count=1 -covermode=atomic -coverprofile=coverage.out
+      - name: coverage floor
+        run: |
+          total=$(go tool cover -func=coverage.out | tail -1 | awk '{print $3}' | tr -d '%')
+          echo "total coverage: $total%"
+          awk -v t="$total" 'BEGIN { if (t+0 < 85.0) { print "FAIL: coverage below 85%"; exit 1 } }'
 
       # A suite that runs zero tests reports success. For a service whose entire
       # job is noticing silence, a vacuously-green suite is exactly the wrong
@@ -62,5 +70,13 @@ jobs:
         with:
           go-version-file: go.mod
       - run: CGO_ENABLED=0 go build -trimpath ./...
-      - name: cross-compile
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath ./cmd/...
+      # The release pipeline's own config and every OS/arch it targets are
+      # exercised here, so a broken .goreleaser.yaml or a Windows-only compile
+      # error fails the PR rather than the tag. Docker is skipped: the image
+      # is verified by the release job, and buildx on a PR is slow for nothing.
+      - name: goreleaser snapshot build
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean
