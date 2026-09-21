@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "event_id": "eaba23c05464b00f",
+  "thread_id": "739fc9f6278ece38",
+  "kind": "new",
+  "cold_start": false,
+  "source_id": "huawei-intl",
+  "provider_id": "13",
+  "title": "Abnormal accounts in AP-Jakarta",
+  "title_lang": "en",
+  "severity": "major",
+  "raw_severity": "2",
+  "status": "open",
+  "started_at": "2026-07-25T19:05:00Z",
+  "updated_at": "2026-07-27T00:04:52Z",
+  "ended_at": null,
+  "global": false,
+  "scope": [
+    {
+      "region_code": "ap-southeast-4",
+      "region_name": "AP-Jakarta",
+      "services": [
+        {
+          "abbr": "ECS",
+          "name": "Elastic Cloud Server"
+        }
+      ]
+    },
+    {
+      "region_code": "tr-west-1",
+      "region_name": "TR-Istanbul",
+      "services": []
+    }
+  ],
+  "new_updates": [
+    {
+      "at": "2026-07-25T19:05:00Z",
+      "text": "Dear customer, …",
+      "lang": "en"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "subject": "[statwatch] NEW major: Abnormal accounts in AP-Jakarta",
+  "text": "NEW · major · huawei-intl #13\nAbnormal accounts in AP-Jakarta\nStatus: open\nPublished: 2026-07-25 19:05 UTC\nRegions: AP-Jakarta (ECS); TR-Istanbul\n\nUpdate 2026-07-25 19:05 UTC:\n  Dear customer, …\n"
+}
