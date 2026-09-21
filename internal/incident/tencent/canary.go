@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // seedEventCode is the fallback known-good probe target: the 2026-04-21 Seoul

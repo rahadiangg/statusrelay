@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
-// Health event kinds. They describe statwatch's ability to see a provider,
+// Health event kinds. They describe statusrelay's ability to see a provider,
 // not the provider's incidents, and travel through the same sinks because a
 // watcher that has gone blind looks exactly like a healthy provider to anyone
 // who is not told otherwise.
@@ -21,14 +21,14 @@ const (
 
 // healthProviderID is the synthetic record id used for health events, so a
 // receiver threading on Key groups every blind/recovered pair per source.
-const healthProviderID = "statwatch"
+const healthProviderID = "statusrelay"
 
 // SourceBlind builds the event for a source that has produced no complete
 // snapshot for longer than the configured threshold. reason is the last fetch
 // error or the snapshot warnings, quoted verbatim so the alert is actionable.
 func SourceBlind(sourceID, reason string, since, now time.Time) incident.Event {
 	r := healthRecord(sourceID, now)
-	r.Title = fmt.Sprintf("statwatch cannot see %s (no complete snapshot for %s)", sourceID, now.Sub(since).Round(time.Second))
+	r.Title = fmt.Sprintf("statusrelay cannot see %s (no complete snapshot for %s)", sourceID, now.Sub(since).Round(time.Second))
 	r.Status = incident.StatusOpen
 	r.StartedAt = since
 	r.Updates = []incident.Update{{At: now, Text: reason, Lang: "en", Hash: incident.HashUpdateText(now, reason)}}
@@ -40,7 +40,7 @@ func SourceBlind(sourceID, reason string, since, now time.Time) incident.Event {
 // snapshot again after being blind.
 func SourceRecovered(sourceID string, blindFor time.Duration, now time.Time) incident.Event {
 	r := healthRecord(sourceID, now)
-	r.Title = fmt.Sprintf("statwatch can see %s again (blind for %s)", sourceID, blindFor.Round(time.Second))
+	r.Title = fmt.Sprintf("statusrelay can see %s again (blind for %s)", sourceID, blindFor.Round(time.Second))
 	r.Status = incident.StatusResolved
 	r.StartedAt = now.Add(-blindFor)
 	r.EndedAt = now
@@ -58,7 +58,7 @@ func healthRecord(sourceID string, now time.Time) incident.Record {
 		// names as the most likely way this tool causes harm: silence read
 		// as health.
 		Severity:    incident.SeverityCritical,
-		RawSeverity: "statwatch",
+		RawSeverity: "statusrelay",
 		Global:      true,
 		UpdatedAt:   now,
 	}

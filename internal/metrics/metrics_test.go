@@ -9,9 +9,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/poller"
 )
 
 var testEpoch = time.Date(2026, 9, 21, 10, 0, 0, 0, time.UTC)
@@ -31,27 +31,27 @@ func TestInitCreatesEverySeriesAtZero(t *testing.T) {
 		name string
 		want int
 	}{
-		{"statwatch_polls_total", 2},
-		{"statwatch_self_checks_total", 2},
-		{"statwatch_snapshot_anomalies_total", len(AnomalyKinds)},
-		{"statwatch_events_total", len(EventKinds)},
-		{"statwatch_records", 3},
-		{"statwatch_deliveries_total", 2},
-		{"statwatch_incidents_open", 1},
-		{"statwatch_incidents_unknown", 1},
-		{"statwatch_source_blind", 1},
-		{"statwatch_last_complete_snapshot_timestamp_seconds", 1},
-		{"statwatch_last_poll_timestamp_seconds", 1},
-		{"statwatch_consecutive_fetch_failures", 1},
-		{"statwatch_snapshots_incomplete_total", 1},
-		{"statwatch_provider_unresolved_count", 0}, // absent until reported
-		{"statwatch_build_info", 1},
+		{"statusrelay_polls_total", 2},
+		{"statusrelay_self_checks_total", 2},
+		{"statusrelay_snapshot_anomalies_total", len(AnomalyKinds)},
+		{"statusrelay_events_total", len(EventKinds)},
+		{"statusrelay_records", 3},
+		{"statusrelay_deliveries_total", 2},
+		{"statusrelay_incidents_open", 1},
+		{"statusrelay_incidents_unknown", 1},
+		{"statusrelay_source_blind", 1},
+		{"statusrelay_last_complete_snapshot_timestamp_seconds", 1},
+		{"statusrelay_last_poll_timestamp_seconds", 1},
+		{"statusrelay_consecutive_fetch_failures", 1},
+		{"statusrelay_snapshots_incomplete_total", 1},
+		{"statusrelay_provider_unresolved_count", 0}, // absent until reported
+		{"statusrelay_build_info", 1},
 	} {
 		if got := testutil.CollectAndCount(reg, tc.name); got != tc.want {
 			t.Errorf("%s: got %d series, want %d", tc.name, got, tc.want)
 		}
 	}
-	if got := testutil.ToFloat64(mustGauge(t, reg, "statwatch_source_blind")); got != 0 {
+	if got := testutil.ToFloat64(mustGauge(t, reg, "statusrelay_source_blind")); got != 0 {
 		t.Errorf("source_blind initial %v, want 0", got)
 	}
 }
@@ -95,57 +95,57 @@ func TestScriptedSequenceExposition(t *testing.T) {
 	r.SelfChecked(src, errors.New("drift"))
 
 	want := `
-# HELP statwatch_consecutive_fetch_failures Fetch failures since the last success.
-# TYPE statwatch_consecutive_fetch_failures gauge
-statwatch_consecutive_fetch_failures{source="huawei-intl"} 3
-# HELP statwatch_deliveries_total Per-sink delivery attempts after retries, by result.
-# TYPE statwatch_deliveries_total counter
-statwatch_deliveries_total{result="error",sink="telegram/oncall"} 1
-statwatch_deliveries_total{result="ok",sink="telegram/oncall"} 1
-# HELP statwatch_incidents_open Matched records the provider currently lists as open. NOT a health signal: zero also means the feed is broken. Alert on statwatch_source_blind instead.
-# TYPE statwatch_incidents_open gauge
-statwatch_incidents_open{source="huawei-intl"} 1
-# HELP statwatch_incidents_unknown Matched records that vanished from the provider without being marked resolved. Still treated as open.
-# TYPE statwatch_incidents_unknown gauge
-statwatch_incidents_unknown{source="huawei-intl"} 2
-# HELP statwatch_last_complete_snapshot_timestamp_seconds Unix time of the last complete snapshot; 0 until the first.
-# TYPE statwatch_last_complete_snapshot_timestamp_seconds gauge
-statwatch_last_complete_snapshot_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
-# HELP statwatch_last_poll_timestamp_seconds Unix time of the last fetch attempt, successful or not.
-# TYPE statwatch_last_poll_timestamp_seconds gauge
-statwatch_last_poll_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
-# HELP statwatch_polls_total Fetch attempts per source, by result.
-# TYPE statwatch_polls_total counter
-statwatch_polls_total{result="error",source="huawei-intl"} 1
-statwatch_polls_total{result="ok",source="huawei-intl"} 1
-# HELP statwatch_provider_unresolved_count The provider's own unresolved count from its statistics endpoint; a cross-check against incidents_open. Absent when the provider did not report one.
-# TYPE statwatch_provider_unresolved_count gauge
-statwatch_provider_unresolved_count{source="huawei-intl"} 1
-# HELP statwatch_records All stored records per source and status, matched or not.
-# TYPE statwatch_records gauge
-statwatch_records{source="huawei-intl",status="open"} 1
-statwatch_records{source="huawei-intl",status="resolved"} 5
-statwatch_records{source="huawei-intl",status="unknown"} 2
-# HELP statwatch_self_checks_total Source integrity probes, by result. A failing probe marks every later snapshot incomplete.
-# TYPE statwatch_self_checks_total counter
-statwatch_self_checks_total{result="error",source="huawei-intl"} 1
-statwatch_self_checks_total{result="ok",source="huawei-intl"} 1
-# HELP statwatch_snapshots_incomplete_total Successful fetches whose snapshot could not vouch for absence (no resolution was inferred from them).
-# TYPE statwatch_snapshots_incomplete_total counter
-statwatch_snapshots_incomplete_total{source="huawei-intl"} 1
-# HELP statwatch_source_blind 1 when the source has produced no complete snapshot within stale_after. Alert when 1: until it clears, 'no incidents' means nothing.
-# TYPE statwatch_source_blind gauge
-statwatch_source_blind{source="huawei-intl"} 1
-# HELP statwatch_state_save_failures_total Failed writes of the state file. State stays in memory; a restart before a later save re-delivers events.
-# TYPE statwatch_state_save_failures_total counter
-statwatch_state_save_failures_total 1
+# HELP statusrelay_consecutive_fetch_failures Fetch failures since the last success.
+# TYPE statusrelay_consecutive_fetch_failures gauge
+statusrelay_consecutive_fetch_failures{source="huawei-intl"} 3
+# HELP statusrelay_deliveries_total Per-sink delivery attempts after retries, by result.
+# TYPE statusrelay_deliveries_total counter
+statusrelay_deliveries_total{result="error",sink="telegram/oncall"} 1
+statusrelay_deliveries_total{result="ok",sink="telegram/oncall"} 1
+# HELP statusrelay_incidents_open Matched records the provider currently lists as open. NOT a health signal: zero also means the feed is broken. Alert on statusrelay_source_blind instead.
+# TYPE statusrelay_incidents_open gauge
+statusrelay_incidents_open{source="huawei-intl"} 1
+# HELP statusrelay_incidents_unknown Matched records that vanished from the provider without being marked resolved. Still treated as open.
+# TYPE statusrelay_incidents_unknown gauge
+statusrelay_incidents_unknown{source="huawei-intl"} 2
+# HELP statusrelay_last_complete_snapshot_timestamp_seconds Unix time of the last complete snapshot; 0 until the first.
+# TYPE statusrelay_last_complete_snapshot_timestamp_seconds gauge
+statusrelay_last_complete_snapshot_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
+# HELP statusrelay_last_poll_timestamp_seconds Unix time of the last fetch attempt, successful or not.
+# TYPE statusrelay_last_poll_timestamp_seconds gauge
+statusrelay_last_poll_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
+# HELP statusrelay_polls_total Fetch attempts per source, by result.
+# TYPE statusrelay_polls_total counter
+statusrelay_polls_total{result="error",source="huawei-intl"} 1
+statusrelay_polls_total{result="ok",source="huawei-intl"} 1
+# HELP statusrelay_provider_unresolved_count The provider's own unresolved count from its statistics endpoint; a cross-check against incidents_open. Absent when the provider did not report one.
+# TYPE statusrelay_provider_unresolved_count gauge
+statusrelay_provider_unresolved_count{source="huawei-intl"} 1
+# HELP statusrelay_records All stored records per source and status, matched or not.
+# TYPE statusrelay_records gauge
+statusrelay_records{source="huawei-intl",status="open"} 1
+statusrelay_records{source="huawei-intl",status="resolved"} 5
+statusrelay_records{source="huawei-intl",status="unknown"} 2
+# HELP statusrelay_self_checks_total Source integrity probes, by result. A failing probe marks every later snapshot incomplete.
+# TYPE statusrelay_self_checks_total counter
+statusrelay_self_checks_total{result="error",source="huawei-intl"} 1
+statusrelay_self_checks_total{result="ok",source="huawei-intl"} 1
+# HELP statusrelay_snapshots_incomplete_total Successful fetches whose snapshot could not vouch for absence (no resolution was inferred from them).
+# TYPE statusrelay_snapshots_incomplete_total counter
+statusrelay_snapshots_incomplete_total{source="huawei-intl"} 1
+# HELP statusrelay_source_blind 1 when the source has produced no complete snapshot within stale_after. Alert when 1: until it clears, 'no incidents' means nothing.
+# TYPE statusrelay_source_blind gauge
+statusrelay_source_blind{source="huawei-intl"} 1
+# HELP statusrelay_state_save_failures_total Failed writes of the state file. State stays in memory; a restart before a later save re-delivers events.
+# TYPE statusrelay_state_save_failures_total counter
+statusrelay_state_save_failures_total 1
 `
 	if err := testutil.GatherAndCompare(reg, strings.NewReader(want),
-		"statwatch_consecutive_fetch_failures", "statwatch_deliveries_total", "statwatch_incidents_open",
-		"statwatch_incidents_unknown", "statwatch_last_complete_snapshot_timestamp_seconds",
-		"statwatch_last_poll_timestamp_seconds", "statwatch_polls_total", "statwatch_provider_unresolved_count",
-		"statwatch_records", "statwatch_self_checks_total", "statwatch_snapshots_incomplete_total",
-		"statwatch_source_blind", "statwatch_state_save_failures_total"); err != nil {
+		"statusrelay_consecutive_fetch_failures", "statusrelay_deliveries_total", "statusrelay_incidents_open",
+		"statusrelay_incidents_unknown", "statusrelay_last_complete_snapshot_timestamp_seconds",
+		"statusrelay_last_poll_timestamp_seconds", "statusrelay_polls_total", "statusrelay_provider_unresolved_count",
+		"statusrelay_records", "statusrelay_self_checks_total", "statusrelay_snapshots_incomplete_total",
+		"statusrelay_source_blind", "statusrelay_state_save_failures_total"); err != nil {
 		t.Error(err)
 	}
 
@@ -159,7 +159,7 @@ statwatch_state_save_failures_total 1
 	if got := testutil.ToFloat64(r.anomalies.WithLabelValues(src, incident.AnomalyCountMismatch)); got != 2 {
 		t.Errorf("anomalies count_mismatch = %v, want 2", got)
 	}
-	if got := testutil.CollectAndCount(reg, "statwatch_poll_duration_seconds"); got != 1 {
+	if got := testutil.CollectAndCount(reg, "statusrelay_poll_duration_seconds"); got != 1 {
 		t.Errorf("histogram series = %d, want 1", got)
 	}
 }
@@ -167,7 +167,7 @@ statwatch_state_save_failures_total 1
 func TestUnresolvedCountNegativeIsNeverExposed(t *testing.T) {
 	r, reg := newTestRecorder(t)
 	r.SnapshotSeen("huawei-intl", &incident.Snapshot{Complete: true, UnresolvedCount: -1})
-	if got := testutil.CollectAndCount(reg, "statwatch_provider_unresolved_count"); got != 0 {
+	if got := testutil.CollectAndCount(reg, "statusrelay_provider_unresolved_count"); got != 0 {
 		t.Errorf("got %d series after -1, want 0", got)
 	}
 	r.SnapshotSeen("huawei-intl", &incident.Snapshot{Complete: true, UnresolvedCount: 4})
@@ -188,11 +188,11 @@ func TestLastCompleteZeroIsNotWritten(t *testing.T) {
 func TestBuildInfoLabels(t *testing.T) {
 	_, reg := newTestRecorder(t)
 	want := `
-# HELP statwatch_build_info Always 1; version and commit as labels.
-# TYPE statwatch_build_info gauge
-statwatch_build_info{commit="abc123",version="v1.2.3"} 1
+# HELP statusrelay_build_info Always 1; version and commit as labels.
+# TYPE statusrelay_build_info gauge
+statusrelay_build_info{commit="abc123",version="v1.2.3"} 1
 `
-	if err := testutil.GatherAndCompare(reg, strings.NewReader(want), "statwatch_build_info"); err != nil {
+	if err := testutil.GatherAndCompare(reg, strings.NewReader(want), "statusrelay_build_info"); err != nil {
 		t.Error(err)
 	}
 }

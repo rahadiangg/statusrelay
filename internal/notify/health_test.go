@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 func TestHealthEventsGolden(t *testing.T) {
@@ -51,7 +51,7 @@ func TestHealthEventIdentity(t *testing.T) {
 	if ThreadID(a.Record.Key) != ThreadID(rec.Record.Key) {
 		t.Error("blind and recovered do not share a thread")
 	}
-	if a.Record.Key.ProviderID != "statwatch" || !a.Record.Global || a.Record.Severity != incident.SeverityCritical {
+	if a.Record.Key.ProviderID != "statusrelay" || !a.Record.Global || a.Record.Severity != incident.SeverityCritical {
 		t.Errorf("health record shape wrong: %+v", a.Record)
 	}
 	if a.Record.Status != incident.StatusOpen || rec.Record.Status != incident.StatusResolved {

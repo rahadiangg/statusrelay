@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // instantClock records every requested wait and fires it immediately, so a

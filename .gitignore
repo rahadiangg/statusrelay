@@ -1,9 +1,9 @@
-/statwatch
-/statwatchctl
+/statusrelay
+/statusrelayctl
 /dist/
 coverage.out
 *.test
-statwatch-state.json*
-statwatch.yaml
+statusrelay-state.json*
+statusrelay.yaml
 .env
 .DS_Store

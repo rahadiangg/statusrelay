@@ -18,7 +18,7 @@
 
 ## Architecture
 
-`cmd/statwatch` polls one or more status-page providers, diffs each observation
+`cmd/statusrelay` polls one or more status-page providers, diffs each observation
 against persisted state, and fans the resulting events out to sinks (Prometheus
 metrics, notifiers).
 
@@ -40,7 +40,7 @@ metrics, notifiers).
 - `internal/store` — persistence. `internal/notify` — transports.
 - `internal/metrics` — Prometheus registry. `internal/httpapi` — /metrics, /healthz, /readyz.
 
-Providers are wired by an explicit `buildSources()` in `cmd/statwatch`, not an
+Providers are wired by an explicit `buildSources()` in `cmd/statusrelay`, not an
 `init()` registry: greppable, no import side effects.
 
 ## The traps this codebase exists to survive
@@ -62,7 +62,7 @@ real shape, not a parse failure) · `SeverityUnknown` always alerts.
 
 **"No incidents" is not "healthy."** The services catalogue has no status field;
 the upstream's own green grid is a client-side projection of published incidents.
-Alerting on `statwatch_incidents_open == 0` as a health signal misreads the data
+Alerting on `statusrelay_incidents_open == 0` as a health signal misreads the data
 source, and that is the most likely way this tool causes harm.
 
 ## Code Standards

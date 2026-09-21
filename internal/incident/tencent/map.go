@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // futureSlack is how far ahead of our clock a StartTime may sit before it is

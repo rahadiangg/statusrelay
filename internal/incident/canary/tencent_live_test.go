@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/incident/tencent"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/incident/tencent"
 )
 
 // Baselines observed live on 2026-09-21. The corpus is tiny (8 events since
@@ -171,7 +171,7 @@ func TestLiveTencentSeedEventStillExists(t *testing.T) {
 func TestLiveTencentUnknownCodeIsEmptyNotError(t *testing.T) {
 	ctx, cancel := contextWithTimeout(t, 30*time.Second)
 	defer cancel()
-	data, apiErr, err := rawTencent(t, ctx, "v1/api/ops/DescribeHistoryEventProgress", url.Values{"HistoryEventCode": {"statwatch-canary-nope"}})
+	data, apiErr, err := rawTencent(t, ctx, "v1/api/ops/DescribeHistoryEventProgress", url.Values{"HistoryEventCode": {"statusrelay-canary-nope"}})
 	if err != nil || apiErr != nil {
 		t.Fatalf("err=%v apiErr=%v; the trap has changed shape", err, apiErr)
 	}

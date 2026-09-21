@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // Message is the rendered, transport-neutral text of one event.
@@ -89,11 +89,11 @@ func Render(ev incident.Event) Message {
 		b.WriteString("\nUntil this recovers, \"no incidents\" means nothing: the feed is not being read. Check the provider site by hand.\n")
 	}
 	if ev.ColdStart {
-		b.WriteString("\nFirst run: this may have started before statwatch did.\n")
+		b.WriteString("\nFirst run: this may have started before statusrelay did.\n")
 	}
 
 	return Message{
-		Subject: oneLine(fmt.Sprintf("[statwatch] %s %s: %s", label, sev, r.Title)),
+		Subject: oneLine(fmt.Sprintf("[statusrelay] %s %s: %s", label, sev, r.Title)),
 		Body:    strings.TrimRight(b.String(), "\n") + "\n",
 	}
 }

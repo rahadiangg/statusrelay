@@ -12,9 +12,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/rahadiangg/statwatch/internal/metrics"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
-	"github.com/rahadiangg/statwatch/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/metrics"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/poller"
 )
 
 var testEpoch = time.Date(2026, 9, 21, 10, 0, 0, 0, time.UTC)
@@ -53,8 +53,8 @@ func TestMetricsEndpoint(t *testing.T) {
 		t.Fatalf("got %d", code)
 	}
 	for _, want := range []string{
-		`statwatch_build_info{commit="c0ffee",version="v-test"} 1`,
-		`statwatch_source_blind{source="huawei-intl"} 0`,
+		`statusrelay_build_info{commit="c0ffee",version="v-test"} 1`,
+		`statusrelay_source_blind{source="huawei-intl"} 0`,
 		`go_goroutines`,
 	} {
 		if !strings.Contains(body, want) {

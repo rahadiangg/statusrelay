@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // Catalogue sanity thresholds.

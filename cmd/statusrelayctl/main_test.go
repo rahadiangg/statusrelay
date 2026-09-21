@@ -48,11 +48,11 @@ func TestRun(t *testing.T) {
 	}{
 		{name: "no args", wantCode: 2, wantErr: "usage"},
 		{name: "unknown command", args: []string{"frob"}, wantCode: 2, wantErr: `unknown command "frob"`},
-		{name: "version", args: []string{"version"}, wantCode: 0, wantOut: "statwatchctl"},
+		{name: "version", args: []string{"version"}, wantCode: 0, wantOut: "statusrelayctl"},
 		{name: "check ok", args: []string{"check-config", "-config", good}, env: secrets, wantCode: 0, wantOut: "OK"},
 		{name: "check invalid", args: []string{"check-config", "-config", bad}, wantCode: 1, wantErr: "INVALID"},
 		{name: "check missing secret", args: []string{"check-config", "-config", good}, env: map[string]string{"T": "x", "P": "y"}, wantCode: 1, wantErr: "S"},
-		{name: "check via env path", args: []string{"check-config"}, env: map[string]string{"STATWATCH_CONFIG": good, "T": "t", "P": "p", "S": "s"}, wantCode: 0, wantOut: "OK"},
+		{name: "check via env path", args: []string{"check-config"}, env: map[string]string{"STATUSRELAY_CONFIG": good, "T": "t", "P": "p", "S": "s"}, wantCode: 0, wantOut: "OK"},
 		{name: "check bad flag", args: []string{"check-config", "-nope"}, wantCode: 2},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

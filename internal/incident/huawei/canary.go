@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // seedEventID is the fallback known-good probe target: the only incident this

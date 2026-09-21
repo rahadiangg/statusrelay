@@ -27,8 +27,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
-	"github.com/rahadiangg/statwatch/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/poller"
 )
 
 // Thresholds tunes the probes.

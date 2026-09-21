@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // DefaultBaseURL is the international status API.

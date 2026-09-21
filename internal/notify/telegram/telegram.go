@@ -17,8 +17,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 // DefaultBaseURL is the public Bot API host.
@@ -75,7 +75,7 @@ func New(name, token, chatID string, opts ...Option) (*Notifier, error) {
 		chatID: chatID,
 		base:   DefaultBaseURL,
 		http:   &http.Client{Timeout: 30 * time.Second},
-		ua:     "statwatch",
+		ua:     "statusrelay",
 	}
 	for _, o := range opts {
 		o(n)

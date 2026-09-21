@@ -1,4 +1,4 @@
-// Command statwatchctl is the operator's companion to statwatch.
+// Command statusrelayctl is the operator's companion to statusrelay.
 //
 // Today it validates a configuration file. Commands that need a running
 // daemon (inspecting state, forcing a poll) arrive with the HTTP API.
@@ -10,7 +10,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/rahadiangg/statwatch/internal/config"
+	"github.com/rahadiangg/statusrelay/internal/config"
 )
 
 var (
@@ -23,7 +23,7 @@ func main() {
 }
 
 func usage(w io.Writer) {
-	fmt.Fprintln(w, "usage: statwatchctl <command> [flags]")
+	fmt.Fprintln(w, "usage: statusrelayctl <command> [flags]")
 	fmt.Fprintln(w, "  check-config [-config path]   load, resolve and validate a config file")
 	fmt.Fprintln(w, "  version                       print version")
 }
@@ -35,12 +35,12 @@ func run(args []string, stdout, stderr io.Writer, getenv func(string) string) in
 	}
 	switch args[0] {
 	case "version":
-		fmt.Fprintf(stdout, "statwatchctl %s (%s)\n", version, commit)
+		fmt.Fprintf(stdout, "statusrelayctl %s (%s)\n", version, commit)
 		return 0
 	case "check-config":
 		return checkConfig(args[1:], stdout, stderr, getenv)
 	default:
-		fmt.Fprintf(stderr, "statwatchctl: unknown command %q\n", args[0])
+		fmt.Fprintf(stderr, "statusrelayctl: unknown command %q\n", args[0])
 		usage(stderr)
 		return 2
 	}
@@ -52,7 +52,7 @@ func run(args []string, stdout, stderr io.Writer, getenv func(string) string) in
 func checkConfig(args []string, stdout, stderr io.Writer, getenv func(string) string) int {
 	fs := flag.NewFlagSet("check-config", flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	cfgPath := fs.String("config", "", "config file (default $"+config.EnvConfig+" or ./statwatch.yaml)")
+	cfgPath := fs.String("config", "", "config file (default $"+config.EnvConfig+" or ./statusrelay.yaml)")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}

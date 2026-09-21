@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")
@@ -144,7 +144,7 @@ func TestBuildGolden(t *testing.T) {
 
 func TestSendRequestShapeAndSignature(t *testing.T) {
 	srv, c := fakeReceiver(t, 200, nil)
-	n, err := New("n8n", srv.URL+"/hook", WithSecret("s3cret"), WithUserAgent("statwatch/test"),
+	n, err := New("n8n", srv.URL+"/hook", WithSecret("s3cret"), WithUserAgent("statusrelay/test"),
 		WithHeaders(map[string]string{"Authorization": "Bearer abc"}), WithTimeout(5*time.Second))
 	if err != nil {
 		t.Fatal(err)
@@ -164,17 +164,17 @@ func TestSendRequestShapeAndSignature(t *testing.T) {
 	}
 	for _, tc := range []struct{ name, want string }{
 		{"Content-Type", "application/json"},
-		{"User-Agent", "statwatch/test"},
+		{"User-Agent", "statusrelay/test"},
 		{"Authorization", "Bearer abc"},
-		{"X-Statwatch-Event-Id", notify.EventID(ev)},
-		{"X-Statwatch-Event-Kind", "new"},
+		{"X-Statusrelay-Event-Id", notify.EventID(ev)},
+		{"X-Statusrelay-Event-Kind", "new"},
 	} {
 		if got := c.header.Get(tc.name); got != tc.want {
 			t.Errorf("%s: got %q, want %q", tc.name, got, tc.want)
 		}
 	}
 	// Verify the signature the way a receiver would: over the raw bytes.
-	sig := strings.TrimPrefix(c.header.Get("X-Statwatch-Signature"), "sha256=")
+	sig := strings.TrimPrefix(c.header.Get("X-Statusrelay-Signature"), "sha256=")
 	if !hmac.Equal([]byte(sig), []byte(Sign([]byte("s3cret"), c.body))) {
 		t.Errorf("signature does not verify: %q", sig)
 	}
@@ -195,7 +195,7 @@ func TestSendWithoutSecretHasNoSignature(t *testing.T) {
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if _, ok := c.header["X-Statwatch-Signature"]; ok {
+	if _, ok := c.header["X-Statusrelay-Signature"]; ok {
 		t.Error("signature header sent without a secret")
 	}
 }

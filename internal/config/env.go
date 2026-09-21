@@ -11,13 +11,13 @@ import (
 // through the *_env keys in the YAML rather than fixed names, so two Telegram
 // sinks can carry two tokens.
 const (
-	EnvConfig       = "STATWATCH_CONFIG"
-	EnvStateFile    = "STATWATCH_STATE_FILE"
-	EnvPollInterval = "STATWATCH_POLL_INTERVAL"
+	EnvConfig       = "STATUSRELAY_CONFIG"
+	EnvStateFile    = "STATUSRELAY_STATE_FILE"
+	EnvPollInterval = "STATUSRELAY_POLL_INTERVAL"
 )
 
 // ConfigPath returns the config file location: the flag value when set, else
-// $STATWATCH_CONFIG, else the default.
+// $STATUSRELAY_CONFIG, else the default.
 func ConfigPath(flagValue string, getenv func(string) string) string {
 	if flagValue != "" {
 		return flagValue
@@ -25,7 +25,7 @@ func ConfigPath(flagValue string, getenv func(string) string) string {
 	if v := getenv(EnvConfig); v != "" {
 		return v
 	}
-	return "statwatch.yaml"
+	return "statusrelay.yaml"
 }
 
 // applyEnv resolves secrets and scalar overrides. Errors name the variable,

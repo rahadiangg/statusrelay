@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // goldenDoc loads a fixture. A missing or empty golden fails loudly: a

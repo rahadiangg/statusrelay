@@ -1,6 +1,6 @@
 # Cut a release from a semver tag: archives for linux/darwin/windows on
 # amd64/arm64, checksums, GitHub release notes, and a multi-arch image on
-# ghcr.io/rahadiangg/statwatch.
+# ghcr.io/rahadiangg/statusrelay.
 #
 # A tag alone is not enough. The commit must be on main and must pass the
 # same lint/test/build gates as a PR, so a release can never contain what a
@@ -78,10 +78,10 @@ jobs:
       # main.version, every artifact above says "dev" and nothing else fails.
       - name: released binary reports the tag
         run: |
-          bin=$(find dist -type f -path '*linux_amd64*' -name statwatch | head -1)
+          bin=$(find dist -type f -path '*linux_amd64*' -name statusrelay | head -1)
           out=$("$bin" -version)
           echo "$out"
           case "$out" in
-            "statwatch ${GITHUB_REF_NAME#v} ("*) ;;
+            "statusrelay ${GITHUB_REF_NAME#v} ("*) ;;
             *) echo "FAIL: expected version ${GITHUB_REF_NAME#v}"; exit 1 ;;
           esac

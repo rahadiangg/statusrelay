@@ -3,7 +3,7 @@ fetch_timeout: 20s
 self_check_interval: 2h
 stale_after: 10m
 vanish_grace: 5
-state_file: /var/lib/statwatch/state.json
+state_file: /var/lib/statusrelay/state.json
 dev_log: true
 
 sources:
@@ -39,7 +39,7 @@ notify:
   smtp:
     - name: ops
       addr: smtp.example.com:587
-      from: "StatWatch <bot@example.com>"
+      from: "StatusRelay <bot@example.com>"
       to: [a@example.com, b@example.com]
       username: bot
       password_env: SMTP_PW

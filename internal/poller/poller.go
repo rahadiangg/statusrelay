@@ -25,10 +25,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
-	"github.com/rahadiangg/statwatch/internal/store"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/store"
 )
 
 // Sink is where events go. It is notify.Notifier by another name so this

@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/alibaba"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/alibaba"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
 )
 
 // Baselines were observed live on 2026-09-21: four resolved incidents (ids

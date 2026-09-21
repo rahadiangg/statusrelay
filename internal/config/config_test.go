@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 func goldenDoc(t *testing.T, name string) []byte {
@@ -46,7 +46,7 @@ func TestParseFull(t *testing.T) {
 		{"self_check_interval", cfg.SelfCheckInterval, 2 * time.Hour},
 		{"stale_after", cfg.StaleAfter, 10 * time.Minute},
 		{"vanish_grace", cfg.VanishGrace, 5},
-		{"state_file", cfg.StateFile, "/var/lib/statwatch/state.json"},
+		{"state_file", cfg.StateFile, "/var/lib/statusrelay/state.json"},
 		{"dev_log", cfg.DevLog, true},
 		{"sources len", len(cfg.Sources), 4},
 		{"alibaba kind", cfg.Sources[2].Kind, "alibaba"},
@@ -252,7 +252,7 @@ func TestConfigPath(t *testing.T) {
 	for _, tc := range []struct{ name, flag, envv, want string }{
 		{name: "flag wins", flag: "/a.yaml", envv: "/b.yaml", want: "/a.yaml"},
 		{name: "env second", flag: "", envv: "/b.yaml", want: "/b.yaml"},
-		{name: "default last", flag: "", envv: "", want: "statwatch.yaml"},
+		{name: "default last", flag: "", envv: "", want: "statusrelay.yaml"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			got := ConfigPath(tc.flag, env(map[string]string{EnvConfig: tc.envv}))

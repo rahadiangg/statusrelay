@@ -18,8 +18,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // Version is the on-disk format version. Bump it when a field changes

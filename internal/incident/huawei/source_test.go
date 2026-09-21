@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 var testEpoch = time.Date(2026, 9, 5, 0, 0, 0, 0, time.UTC)
@@ -679,9 +679,9 @@ func TestUserAgentReachesTheUpstream(t *testing.T) {
 	t.Cleanup(srv.Close)
 
 	// No WithHTTPClient: this is the production construction path, the one
-	// that used to hardcode statwatch/dev regardless of the release.
+	// that used to hardcode statusrelay/dev regardless of the release.
 	s, err := New("huawei-intl", srv.URL+"/intl",
-		WithUserAgent("statwatch/v1.2.3"),
+		WithUserAgent("statusrelay/v1.2.3"),
 		WithClock(clock.NewFake(testEpoch)))
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -689,7 +689,7 @@ func TestUserAgentReachesTheUpstream(t *testing.T) {
 	_, _ = s.Fetch(t.Context())
 	mu.Lock()
 	defer mu.Unlock()
-	if got != "statwatch/v1.2.3" {
-		t.Errorf("User-Agent: got %q, want %q", got, "statwatch/v1.2.3")
+	if got != "statusrelay/v1.2.3" {
+		t.Errorf("User-Agent: got %q, want %q", got, "statusrelay/v1.2.3")
 	}
 }

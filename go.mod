@@ -1,4 +1,4 @@
-module github.com/rahadiangg/statwatch
+module github.com/rahadiangg/statusrelay
 
 go 1.26.5
 

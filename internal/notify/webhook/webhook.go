@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 // Schema is the payload version, sent as "schema" in every document.
@@ -46,7 +46,7 @@ type Notifier struct {
 // Option configures a Notifier.
 type Option func(*Notifier)
 
-// WithSecret enables the X-Statwatch-Signature header.
+// WithSecret enables the X-Statusrelay-Signature header.
 func WithSecret(s string) Option { return func(n *Notifier) { n.secret = []byte(s) } }
 
 // WithHeaders adds fixed request headers, e.g. Authorization. Validated in New.
@@ -76,7 +76,7 @@ func New(name, target string, opts ...Option) (*Notifier, error) {
 		name: "webhook/" + name,
 		url:  u.String(),
 		http: &http.Client{Timeout: 30 * time.Second},
-		ua:   "statwatch",
+		ua:   "statusrelay",
 	}
 	for _, o := range opts {
 		o(n)
@@ -211,10 +211,10 @@ func (n *Notifier) Send(ctx context.Context, ev incident.Event) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", n.ua)
-	req.Header.Set("X-Statwatch-Event-Id", notify.EventID(ev))
-	req.Header.Set("X-Statwatch-Event-Kind", string(ev.Kind))
+	req.Header.Set("X-Statusrelay-Event-Id", notify.EventID(ev))
+	req.Header.Set("X-Statusrelay-Event-Kind", string(ev.Kind))
 	if len(n.secret) > 0 {
-		req.Header.Set("X-Statwatch-Signature", "sha256="+Sign(n.secret, body))
+		req.Header.Set("X-Statusrelay-Signature", "sha256="+Sign(n.secret, body))
 	}
 	for k, v := range n.headers {
 		req.Header.Set(k, v)

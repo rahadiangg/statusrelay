@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // SendMailFunc mirrors net/smtp.SendMail so tests can substitute it.
@@ -96,7 +96,7 @@ func New(name, addr, from string, to []string, opts ...Option) (*Notifier, error
 		to:       toAddrs,
 		clock:    clock.System{},
 		sendMail: smtp.SendMail,
-		ua:       "statwatch",
+		ua:       "statusrelay",
 	}
 	for _, o := range opts {
 		o(n)
@@ -140,8 +140,8 @@ func (n *Notifier) build(ev incident.Event) ([]byte, error) {
 	}
 	// The opening message IS the thread root; every later event replies to
 	// it. A client that never saw the opener still groups by References.
-	root := "<" + notify.ThreadID(ev.Record.Key) + "@statwatch>"
-	msgID := "<" + notify.EventID(ev) + "@statwatch>"
+	root := "<" + notify.ThreadID(ev.Record.Key) + "@statusrelay>"
+	msgID := "<" + notify.EventID(ev) + "@statusrelay>"
 	if ev.Kind == incident.KindNew {
 		msgID = root
 	}
@@ -156,7 +156,7 @@ func (n *Notifier) build(ev incident.Event) ([]byte, error) {
 		{"Content-Type", "text/plain; charset=utf-8"},
 		{"Content-Transfer-Encoding", "quoted-printable"},
 		{"X-Mailer", n.ua},
-		{"X-Statwatch-Event-Kind", string(ev.Kind)},
+		{"X-Statusrelay-Event-Kind", string(ev.Kind)},
 	}
 	if ev.Kind != incident.KindNew {
 		headers = append(headers, [2]string{"In-Reply-To", root}, [2]string{"References", root})

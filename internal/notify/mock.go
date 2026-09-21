@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // Fake is a hand-written Notifier for tests in this and other packages.

@@ -1,4 +1,4 @@
-// Command statwatch polls status-page providers, diffs each observation
+// Command statusrelay polls status-page providers, diffs each observation
 // against persisted state, and delivers the resulting incident events — and
 // its own blind/recovered transitions — to the configured notifiers.
 package main
@@ -13,13 +13,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/rahadiangg/statwatch/internal/config"
-	"github.com/rahadiangg/statwatch/internal/httpapi"
-	"github.com/rahadiangg/statwatch/internal/metrics"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
-	"github.com/rahadiangg/statwatch/internal/platform/logging"
-	"github.com/rahadiangg/statwatch/internal/poller"
-	"github.com/rahadiangg/statwatch/internal/store"
+	"github.com/rahadiangg/statusrelay/internal/config"
+	"github.com/rahadiangg/statusrelay/internal/httpapi"
+	"github.com/rahadiangg/statusrelay/internal/metrics"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/platform/logging"
+	"github.com/rahadiangg/statusrelay/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/store"
 )
 
 // Set by -ldflags at build time; see the Makefile.
@@ -34,27 +34,27 @@ func main() {
 
 // run is main without os.Exit, so it can be exercised from a test.
 func run(args []string) int {
-	fs := flag.NewFlagSet("statwatch", flag.ContinueOnError)
-	cfgPath := fs.String("config", "", "config file (default $"+config.EnvConfig+" or ./statwatch.yaml)")
+	fs := flag.NewFlagSet("statusrelay", flag.ContinueOnError)
+	cfgPath := fs.String("config", "", "config file (default $"+config.EnvConfig+" or ./statusrelay.yaml)")
 	showVersion := fs.Bool("version", false, "print version and exit")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if *showVersion {
-		fmt.Printf("statwatch %s (%s)\n", version, commit)
+		fmt.Printf("statusrelay %s (%s)\n", version, commit)
 		return 0
 	}
 
 	path := config.ConfigPath(*cfgPath, os.Getenv)
 	cfg, err := config.Load(path, os.Getenv)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "statwatch: %v\n", err)
+		fmt.Fprintf(os.Stderr, "statusrelay: %v\n", err)
 		return 2
 	}
 
 	log := logging.New(cfg.DevLog)
 	clk := clock.System{}
-	ua := "statwatch/" + version
+	ua := "statusrelay/" + version
 
 	sources, err := buildSources(cfg, clk, log, ua)
 	if err != nil {

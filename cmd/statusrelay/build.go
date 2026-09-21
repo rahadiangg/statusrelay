@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/rahadiangg/statwatch/internal/config"
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/alibaba"
-	"github.com/rahadiangg/statwatch/internal/incident/huawei"
-	"github.com/rahadiangg/statwatch/internal/incident/tencent"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/notify/smtp"
-	"github.com/rahadiangg/statwatch/internal/notify/telegram"
-	"github.com/rahadiangg/statwatch/internal/notify/webhook"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
-	"github.com/rahadiangg/statwatch/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/config"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/alibaba"
+	"github.com/rahadiangg/statusrelay/internal/incident/huawei"
+	"github.com/rahadiangg/statusrelay/internal/incident/tencent"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/notify/smtp"
+	"github.com/rahadiangg/statusrelay/internal/notify/telegram"
+	"github.com/rahadiangg/statusrelay/internal/notify/webhook"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/poller"
 )
 
 // buildSources wires config to adapters with an explicit switch on kind.

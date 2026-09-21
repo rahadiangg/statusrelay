@@ -13,8 +13,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 const testToken = "123456:ABC-secret-token"
@@ -75,7 +75,7 @@ func TestNewRejectsEmptyConfig(t *testing.T) {
 
 func TestSendRequestShape(t *testing.T) {
 	srv, c := fakeAPI(t, 200, `{"ok":true,"result":{}}`)
-	n, err := New("oncall", testToken, "-100123", WithBaseURL(srv.URL+"/"), WithThreadID(42), WithUserAgent("statwatch/test"))
+	n, err := New("oncall", testToken, "-100123", WithBaseURL(srv.URL+"/"), WithThreadID(42), WithUserAgent("statusrelay/test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,8 +90,8 @@ func TestSendRequestShape(t *testing.T) {
 	if want := "/bot" + testToken + "/sendMessage"; c.path != want {
 		t.Errorf("got path %q, want %q", c.path, want)
 	}
-	if c.ua != "statwatch/test" {
-		t.Errorf("got UA %q, want statwatch/test", c.ua)
+	if c.ua != "statusrelay/test" {
+		t.Errorf("got UA %q, want statusrelay/test", c.ua)
 	}
 	if c.body.ChatID != "-100123" {
 		t.Errorf("got chat_id %q, want -100123", c.body.ChatID)
@@ -102,7 +102,7 @@ func TestSendRequestShape(t *testing.T) {
 	if !c.body.DisableWebPagePreview {
 		t.Error("disable_web_page_preview not set")
 	}
-	if !strings.HasPrefix(c.body.Text, "[statwatch] NEW major: Abnormal accounts in AP-Jakarta\n\nNEW · major") {
+	if !strings.HasPrefix(c.body.Text, "[statusrelay] NEW major: Abnormal accounts in AP-Jakarta\n\nNEW · major") {
 		t.Errorf("unexpected text:\n%s", c.body.Text)
 	}
 }
@@ -206,7 +206,7 @@ func TestSendTruncatesByRune(t *testing.T) {
 	if !strings.HasSuffix(text, truncatedMarker) {
 		t.Errorf("truncated text lacks marker; tail: %q", text[len(text)-40:])
 	}
-	if !strings.HasPrefix(text, "[statwatch] NEW major") {
+	if !strings.HasPrefix(text, "[statusrelay] NEW major") {
 		t.Error("truncation dropped the subject")
 	}
 }

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 var testEpoch = time.Date(2026, 9, 21, 10, 0, 0, 0, time.UTC)

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")

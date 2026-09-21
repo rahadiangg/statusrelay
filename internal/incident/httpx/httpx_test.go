@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // newTestClient points a Client at h with retries and backoff disabled, so
@@ -302,12 +302,12 @@ func TestSendsHonestUserAgent(t *testing.T) {
 		got = r.Header.Get("User-Agent")
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`[]`))
-	}, WithUserAgent("statwatch/1.0 (+mailto:ops@example.com)"))
+	}, WithUserAgent("statusrelay/1.0 (+mailto:ops@example.com)"))
 
 	if _, err := c.GetJSON(t.Context(), srv.URL, nil); err != nil {
 		t.Fatalf("GetJSON: %v", err)
 	}
-	if got != "statwatch/1.0 (+mailto:ops@example.com)" {
+	if got != "statusrelay/1.0 (+mailto:ops@example.com)" {
 		t.Errorf("User-Agent = %q, want the configured value", got)
 	}
 }

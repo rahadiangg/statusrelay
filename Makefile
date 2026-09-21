@@ -1,14 +1,14 @@
-# statwatch build pipeline.
+# statusrelay build pipeline.
 #
 # `make build` is pure Go: no Node, no codegen, no staging step, so a clean
 # checkout builds with the Go toolchain alone and `go install` works.
 # Releases are cut by GoReleaser from a v* tag (see .goreleaser.yaml); `make
 # snapshot` runs the same pipeline locally without publishing.
 
-BINARY  := statwatch
-CTL     := statwatchctl
-PKG     := ./cmd/statwatch
-CTLPKG  := ./cmd/statwatchctl
+BINARY  := statusrelay
+CTL     := statusrelayctl
+PKG     := ./cmd/statusrelay
+CTLPKG  := ./cmd/statusrelayctl
 # Leading v stripped to match GoReleaser's {{ .Version }}, so a local build
 # and a released one print the same shape.
 LDFLAGS := -s -w -X main.version=$(shell git describe --tags --always --dirty 2>/dev/null | sed 's/^v//' || echo dev) -X main.commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo none)

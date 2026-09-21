@@ -1,4 +1,4 @@
-# statwatch
+# statusrelay
 
 Polls a cloud provider's public status page, diffs each observation against
 persisted state, and delivers incident events — new, updated, resolved, and
@@ -11,40 +11,40 @@ ignores its own `region_code` parameter.
 
 > **"No incidents" is not "healthy."** The upstream has no status field; its
 > green grid is a projection of published incidents. Alerting on
-> `statwatch_incidents_open == 0` as a health signal misreads the source.
-> Alert on the events statwatch emits, and on `statwatch_source_blind`.
+> `statusrelay_incidents_open == 0` as a health signal misreads the source.
+> Alert on the events statusrelay emits, and on `statusrelay_source_blind`.
 
 ## Install
 
 Release archives for linux, macOS and Windows (amd64, arm64) are on the
-[releases page](https://github.com/rahadiangg/statwatch/releases). Each
-contains `statwatch`, `statwatchctl`, this README, the license and
-`statwatch.example.yaml`. `checksums.txt` is SHA-256.
+[releases page](https://github.com/rahadiangg/statusrelay/releases). Each
+contains `statusrelay`, `statusrelayctl`, this README, the license and
+`statusrelay.example.yaml`. `checksums.txt` is SHA-256.
 
 ```sh
 # from source
-go install github.com/rahadiangg/statwatch/cmd/statwatch@latest
-go install github.com/rahadiangg/statwatch/cmd/statwatchctl@latest
+go install github.com/rahadiangg/statusrelay/cmd/statusrelay@latest
+go install github.com/rahadiangg/statusrelay/cmd/statusrelayctl@latest
 ```
 
 macOS: the binaries are not notarized. If Gatekeeper refuses to run one:
-`xattr -d com.apple.quarantine ./statwatch`.
+`xattr -d com.apple.quarantine ./statusrelay`.
 
 ### Container
 
 ```sh
 docker run --rm \
-  -v "$PWD/statwatch.yaml:/etc/statwatch/statwatch.yaml:ro" \
-  -v statwatch-data:/data \
-  -e STATWATCH_TELEGRAM_TOKEN \
+  -v "$PWD/statusrelay.yaml:/etc/statusrelay/statusrelay.yaml:ro" \
+  -v statusrelay-data:/data \
+  -e STATUSRELAY_TELEGRAM_TOKEN \
   -p 9101:9101 \
-  ghcr.io/rahadiangg/statwatch:latest
+  ghcr.io/rahadiangg/statusrelay:latest
 ```
 
-Image: `ghcr.io/rahadiangg/statwatch`, tags `vX.Y.Z`, `vX.Y`, `vX`, `latest`
+Image: `ghcr.io/rahadiangg/statusrelay`, tags `vX.Y.Z`, `vX.Y`, `vX`, `latest`
 (floating tags never point at a prerelease). Multi-arch linux/amd64 and
 linux/arm64, distroless, runs as uid 65532, no shell. The config is read from
-`$STATWATCH_CONFIG` (`/etc/statwatch/statwatch.yaml`) and state is written
+`$STATUSRELAY_CONFIG` (`/etc/statusrelay/statusrelay.yaml`) and state is written
 to `/data`; mount a volume there or state is lost on restart and every open
 incident is re-announced. Secrets come from the environment, never the file.
 
@@ -55,11 +55,11 @@ probes at these.
 
 ## Configure
 
-Copy [`statwatch.example.yaml`](statwatch.example.yaml) and edit. Every key
+Copy [`statusrelay.example.yaml`](statusrelay.example.yaml) and edit. Every key
 is validated at startup; unknown keys are an error. Then:
 
 ```sh
-statwatchctl check-config -config statwatch.yaml
+statusrelayctl check-config -config statusrelay.yaml
 ```
 
 `check-config` runs the same loader as the daemon and prints the resolved
@@ -76,8 +76,8 @@ history is never alerted.
 ## Run
 
 ```sh
-statwatch -config statwatch.yaml     # or $STATWATCH_CONFIG, or ./statwatch.yaml
-statwatch -version
+statusrelay -config statusrelay.yaml     # or $STATUSRELAY_CONFIG, or ./statusrelay.yaml
+statusrelay -version
 ```
 
 Stops cleanly on SIGINT/SIGTERM. State is written atomically after every

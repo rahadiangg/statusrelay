@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // Notifier delivers one event over one transport.

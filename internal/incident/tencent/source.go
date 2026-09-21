@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // DefaultBaseURL is the international dashboard. There is no path-prefix
@@ -63,7 +63,7 @@ func WithRegions(c, n []string) Option {
 func WithHTTPClient(d doer) Option { return func(s *Source) { s.client.http = d } }
 
 // WithUserAgent sets the User-Agent sent upstream. Ignored when WithHTTPClient
-// supplies the transport. Without it every release identifies as statwatch/dev,
+// supplies the transport. Without it every release identifies as statusrelay/dev,
 // which is useless to whoever reads the upstream's access log when deciding
 // what to block.
 func WithUserAgent(ua string) Option { return func(s *Source) { s.userAgent = ua } }

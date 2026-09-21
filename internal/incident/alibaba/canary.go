@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
 )
 
 // Seed probe target: the newest incident on the international site when this

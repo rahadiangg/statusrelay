@@ -3,7 +3,7 @@
 //
 // Adapters live in subpackages (huawei, and whatever comes next). Nothing
 // outside this package may depend on a concrete adapter: callers talk to Source,
-// so a new status page is an added subpackage and one line in cmd/statwatch, not
+// so a new status page is an added subpackage and one line in cmd/statusrelay, not
 // an edit to the poll path.
 //
 // The shapes here are deliberately paranoid. The upstream this was designed

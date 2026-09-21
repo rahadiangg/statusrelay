@@ -17,9 +17,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 var testEpoch = time.Date(2026, 9, 21, 10, 30, 0, 0, time.UTC)
@@ -148,8 +148,8 @@ func testEvent(kind incident.EventKind) incident.Event {
 
 func newTestNotifier(t *testing.T, relay *fakeRelay, opts ...Option) *Notifier {
 	t.Helper()
-	base := []Option{WithClock(clock.NewFake(testEpoch)), WithUserAgent("statwatch/test")}
-	n, err := New("ops", relay.addr(), "StatWatch <bot@example.com>",
+	base := []Option{WithClock(clock.NewFake(testEpoch)), WithUserAgent("statusrelay/test")}
+	n, err := New("ops", relay.addr(), "StatusRelay <bot@example.com>",
 		[]string{"On Call <oncall@example.com>", "sre@example.com"}, append(base, opts...)...)
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -212,15 +212,15 @@ func TestSendDeliversWellFormedMessage(t *testing.T) {
 		t.Fatalf("subject decode: %v", err)
 	}
 	for _, tc := range []struct{ name, got, want string }{
-		{"From", h.Get("From"), `"StatWatch" <bot@example.com>`},
+		{"From", h.Get("From"), `"StatusRelay" <bot@example.com>`},
 		{"To", h.Get("To"), `"On Call" <oncall@example.com>, <sre@example.com>`},
-		{"Subject", subject, "[statwatch] NEW major: 亚太-雅加达 ECS anomaly: <b>不是</b> markup"},
+		{"Subject", subject, "[statusrelay] NEW major: 亚太-雅加达 ECS anomaly: <b>不是</b> markup"},
 		{"Date", h.Get("Date"), "Mon, 21 Sep 2026 10:30:00 +0000"},
-		{"Message-ID", h.Get("Message-ID"), "<" + notify.ThreadID(ev.Record.Key) + "@statwatch>"},
+		{"Message-ID", h.Get("Message-ID"), "<" + notify.ThreadID(ev.Record.Key) + "@statusrelay>"},
 		{"Content-Type", h.Get("Content-Type"), "text/plain; charset=utf-8"},
 		{"Content-Transfer-Encoding", h.Get("Content-Transfer-Encoding"), "quoted-printable"},
-		{"X-Mailer", h.Get("X-Mailer"), "statwatch/test"},
-		{"X-Statwatch-Event-Kind", h.Get("X-Statwatch-Event-Kind"), "new"},
+		{"X-Mailer", h.Get("X-Mailer"), "statusrelay/test"},
+		{"X-Statusrelay-Event-Kind", h.Get("X-Statusrelay-Event-Kind"), "new"},
 		{"In-Reply-To (opener has none)", h.Get("In-Reply-To"), ""},
 	} {
 		if tc.got != tc.want {
@@ -270,8 +270,8 @@ func TestSendThreadsFollowUps(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root := "<" + notify.ThreadID(ev.Record.Key) + "@statwatch>"
-	own := "<" + notify.EventID(ev) + "@statwatch>"
+	root := "<" + notify.ThreadID(ev.Record.Key) + "@statusrelay>"
+	own := "<" + notify.EventID(ev) + "@statusrelay>"
 	for _, tc := range []struct{ name, got, want string }{
 		{"Message-ID", msg.Header.Get("Message-ID"), own},
 		{"In-Reply-To", msg.Header.Get("In-Reply-To"), root},

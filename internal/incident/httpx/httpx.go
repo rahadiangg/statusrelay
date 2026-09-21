@@ -32,7 +32,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // DefaultMaxBody caps the decompressed response. Generous for a status feed
@@ -105,7 +105,7 @@ func WithHeader(key, value string) Option {
 // New builds a Client with defaults suited to polling a public status feed.
 func New(opts ...Option) *Client {
 	c := &Client{
-		ua:        "statwatch/dev",
+		ua:        "statusrelay/dev",
 		maxBody:   DefaultMaxBody,
 		retries:   2,
 		backoff:   500 * time.Millisecond,

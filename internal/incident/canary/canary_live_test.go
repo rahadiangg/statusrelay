@@ -16,7 +16,7 @@
 //
 // Baselines were observed live on 2026-09-05. A failure is a signal, not a
 // flake: read it as "the contract moved", and update the fixtures with
-// `statwatchctl capture` once you understand how.
+// `statusrelayctl capture` once you understand how.
 package canary
 
 import (
@@ -26,12 +26,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/incident/huawei"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/incident/huawei"
 )
 
-const ua = "statwatch-canary/1.0 (+https://github.com/rahadiangg/statwatch)"
+const ua = "statusrelay-canary/1.0 (+https://github.com/rahadiangg/statusrelay)"
 
 func newSource(t *testing.T) *huawei.Source {
 	t.Helper()

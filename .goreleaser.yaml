@@ -2,16 +2,16 @@
 # `make snapshot` runs it locally with nothing published.
 version: 2
 
-project_name: statwatch
+project_name: statusrelay
 
 before:
   hooks:
     - go mod verify
 
 builds:
-  - id: statwatch
-    main: ./cmd/statwatch
-    binary: statwatch
+  - id: statusrelay
+    main: ./cmd/statusrelay
+    binary: statusrelay
     env: [CGO_ENABLED=0]
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
@@ -20,9 +20,9 @@ builds:
       - -s -w -X main.version={{ .Version }} -X main.commit={{ .ShortCommit }}
     # Commit time, not build time, so two builds of one tag are byte-identical.
     mod_timestamp: "{{ .CommitTimestamp }}"
-  - id: statwatchctl
-    main: ./cmd/statwatchctl
-    binary: statwatchctl
+  - id: statusrelayctl
+    main: ./cmd/statusrelayctl
+    binary: statusrelayctl
     env: [CGO_ENABLED=0]
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
@@ -33,7 +33,7 @@ builds:
 
 archives:
   - id: default
-    ids: [statwatch, statwatchctl]
+    ids: [statusrelay, statusrelayctl]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     formats: [tar.gz]
     format_overrides:
@@ -42,7 +42,7 @@ archives:
     files:
       - LICENSE
       - README.md
-      - statwatch.example.yaml
+      - statusrelay.example.yaml
 
 checksum:
   name_template: checksums.txt
@@ -54,10 +54,10 @@ checksum:
 # rejects uppercase and repository_owner is not guaranteed to be lowercase.
 dockers_v2:
   - id: ghcr
-    ids: [statwatch, statwatchctl]
+    ids: [statusrelay, statusrelayctl]
     dockerfile: Dockerfile
     images:
-      - ghcr.io/rahadiangg/statwatch
+      - ghcr.io/rahadiangg/statusrelay
     platforms: [linux/amd64, linux/arm64]
     tags:
       - v{{ .Version }}
@@ -69,7 +69,7 @@ dockers_v2:
       org.opencontainers.image.version: "{{ .Version }}"
       org.opencontainers.image.revision: "{{ .FullCommit }}"
       org.opencontainers.image.created: "{{ .Date }}"
-      org.opencontainers.image.source: https://github.com/rahadiangg/statwatch
+      org.opencontainers.image.source: https://github.com/rahadiangg/statusrelay
       org.opencontainers.image.licenses: MIT
 
 changelog:
@@ -85,7 +85,7 @@ changelog:
 release:
   github:
     owner: rahadiangg
-    name: statwatch
+    name: statusrelay
   # A semver prerelease tag (v1.2.0-rc.1) becomes a GitHub prerelease.
   prerelease: auto
   draft: false

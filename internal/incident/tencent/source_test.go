@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/incident/httpx"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident/httpx"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 // routes maps an rpc path suffix to a fixture. A request to an unmapped path
@@ -519,7 +519,7 @@ func TestUserAgentReachesTheUpstream(t *testing.T) {
 
 	// No WithHTTPClient: this is the production construction path.
 	s, err := New("tencent-intl", srv.URL,
-		WithUserAgent("statwatch/v1.2.3"),
+		WithUserAgent("statusrelay/v1.2.3"),
 		WithClock(clock.NewFake(testEpoch)))
 	if err != nil {
 		t.Fatalf("New: %v", err)
@@ -527,7 +527,7 @@ func TestUserAgentReachesTheUpstream(t *testing.T) {
 	_, _ = s.Fetch(t.Context())
 	mu.Lock()
 	defer mu.Unlock()
-	if got != "statwatch/v1.2.3" {
-		t.Errorf("User-Agent: got %q, want %q", got, "statwatch/v1.2.3")
+	if got != "statusrelay/v1.2.3" {
+		t.Errorf("User-Agent: got %q, want %q", got, "statusrelay/v1.2.3")
 	}
 }

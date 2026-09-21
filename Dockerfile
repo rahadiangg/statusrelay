@@ -16,14 +16,14 @@ ARG TARGETOS
 ARG TARGETARCH
 
 COPY --from=mk --chown=65532:65532 /data /data
-COPY ${TARGETOS}/${TARGETARCH}/statwatch ${TARGETOS}/${TARGETARCH}/statwatchctl /usr/local/bin/
+COPY ${TARGETOS}/${TARGETARCH}/statusrelay ${TARGETOS}/${TARGETARCH}/statusrelayctl /usr/local/bin/
 
 # Relative state_file resolves against the working directory, so WORKDIR and
-# STATWATCH_STATE_FILE agree even if an operator's config omits state_file.
-ENV STATWATCH_CONFIG=/etc/statwatch/statwatch.yaml \
-    STATWATCH_STATE_FILE=/data/statwatch-state.json
+# STATUSRELAY_STATE_FILE agree even if an operator's config omits state_file.
+ENV STATUSRELAY_CONFIG=/etc/statusrelay/statusrelay.yaml \
+    STATUSRELAY_STATE_FILE=/data/statusrelay-state.json
 WORKDIR /data
 VOLUME /data
 EXPOSE 9101
 
-ENTRYPOINT ["/usr/local/bin/statwatch"]
+ENTRYPOINT ["/usr/local/bin/statusrelay"]

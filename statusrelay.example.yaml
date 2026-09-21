@@ -1,4 +1,4 @@
-# statwatch configuration.
+# statusrelay configuration.
 #
 # Every key is validated at startup; an unknown or misspelt key is an error,
 # not a silently ignored line. Durations need a unit (60s, 15m, 1h).
@@ -10,7 +10,7 @@ fetch_timeout: 45s          # bound on one fetch, one self-check, one notifier d
 self_check_interval: 1h     # how often the source proves its feed is still truthful
 stale_after: 15m            # no complete snapshot for this long => "SOURCE BLIND" alert
 vanish_grace: 3             # complete snapshots an open incident must be absent from before it is inferred resolved
-state_file: /var/lib/statwatch/state.json   # relative paths resolve against the working directory
+state_file: /var/lib/statusrelay/state.json   # relative paths resolve against the working directory
 dev_log: false              # true: human-readable debug logs; false: JSON at info
 
 sources:
@@ -24,7 +24,7 @@ sources:
       # Region CODES, not names, decide what you monitor. AP-Jakarta is
       # ap-southeast-4; ap-southeast-3 is AP-Singapore. A wrong code
       # monitors the wrong country forever and reports healthy. Giving the
-      # name too makes statwatch verify the pairing against the live
+      # name too makes statusrelay verify the pairing against the live
       # catalogue at startup and refuse to run on a mismatch.
       - {code: ap-southeast-4, name: AP-Jakarta}
     # all_regions: true          # instead of a regions list; must be explicit
@@ -57,7 +57,7 @@ sources:
   #     # Codes are human-readable here (ap-jakarta, ap-singapore, ap-seoul,
   #     # eu-frankfurt, na-ashburn, ...). Unknown codes are NOT an error
   #     # upstream — the API answers them with an empty grid at HTTP 200 —
-  #     # so statwatch checks them against the live catalogue at startup.
+  #     # so statusrelay checks them against the live catalogue at startup.
   #     - {code: ap-jakarta, name: Jakarta}
   #   # services: [CVM, CBS, CLB]  # product ids, upper-cased
   #   include_global: true        # "non-regional" events (platform-wide) count as global
@@ -76,19 +76,19 @@ notify:
   telegram:
     - name: oncall
       chat_id: "-1001234567890"     # numeric id or @channelusername; quote negative ids
-      token_env: STATWATCH_TELEGRAM_TOKEN
+      token_env: STATUSRELAY_TELEGRAM_TOKEN
       # thread_id: 42               # forum topic inside a supergroup
   smtp:
     - name: ops
       addr: smtp.example.com:587    # STARTTLS is used when the relay offers it
-      from: "StatWatch <statwatch@example.com>"
+      from: "StatusRelay <statusrelay@example.com>"
       to: ["On Call <oncall@example.com>"]
-      username: statwatch@example.com
-      password_env: STATWATCH_SMTP_PASSWORD
+      username: statusrelay@example.com
+      password_env: STATUSRELAY_SMTP_PASSWORD
   webhook:
     - name: n8n
-      url: https://hooks.example.com/statwatch   # redirects are refused; give the final URL
-      secret_env: STATWATCH_WEBHOOK_SECRET       # X-Statwatch-Signature: sha256=<hmac of body>
+      url: https://hooks.example.com/statusrelay   # redirects are refused; give the final URL
+      secret_env: STATUSRELAY_WEBHOOK_SECRET       # X-Statusrelay-Signature: sha256=<hmac of body>
       headers:
         Authorization: "Bearer replace-me"
 

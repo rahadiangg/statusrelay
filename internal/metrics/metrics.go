@@ -8,7 +8,7 @@
 //
 // Every series is pre-initialised to zero at startup. To an alert rule,
 // "absent" and "zero" are different answers: rate() over a counter that does
-// not exist yet returns nothing, and statwatch_source_blind missing looks
+// not exist yet returns nothing, and statusrelay_source_blind missing looks
 // like "not blind" only to a human.
 package metrics
 
@@ -18,12 +18,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/notify"
-	"github.com/rahadiangg/statwatch/internal/poller"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
+	"github.com/rahadiangg/statusrelay/internal/poller"
 )
 
-const ns = "statwatch"
+const ns = "statusrelay"
 
 // EventKinds is every kind the poller can emit, for pre-initialisation.
 var EventKinds = []incident.EventKind{
@@ -91,7 +91,7 @@ func New(reg *prometheus.Registry, version, commit string) *Recorder {
 			Help: "Failed writes of the state file. State stays in memory; a restart before a later save re-delivers events."}),
 
 		open: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "incidents_open",
-			Help: "Matched records the provider currently lists as open. NOT a health signal: zero also means the feed is broken. Alert on statwatch_source_blind instead."}, []string{"source"}),
+			Help: "Matched records the provider currently lists as open. NOT a health signal: zero also means the feed is broken. Alert on statusrelay_source_blind instead."}, []string{"source"}),
 		unknown: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "incidents_unknown",
 			Help: "Matched records that vanished from the provider without being marked resolved. Still treated as open."}, []string{"source"}),
 		records: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "records",

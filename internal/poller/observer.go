@@ -4,7 +4,7 @@ import (
 	"maps"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // Observer receives the loop's facts as they happen. It is push-only so the

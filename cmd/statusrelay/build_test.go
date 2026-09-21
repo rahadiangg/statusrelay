@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rahadiangg/statwatch/internal/config"
-	"github.com/rahadiangg/statwatch/internal/incident"
-	"github.com/rahadiangg/statwatch/internal/platform/clock"
+	"github.com/rahadiangg/statusrelay/internal/config"
+	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
 var testEpoch = time.Date(2026, 9, 21, 10, 0, 0, 0, time.UTC)
@@ -50,7 +50,7 @@ notify:
 
 func TestBuildSources(t *testing.T) {
 	cfg := fullConfig(t)
-	srcs, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statwatch/test")
+	srcs, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statusrelay/test")
 	if err != nil {
 		t.Fatalf("buildSources: %v", err)
 	}
@@ -74,7 +74,7 @@ func TestBuildSources(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			c := fullConfig(t)
 			tc.set(&c.Sources[3])
-			_, err := buildSources(c, clock.NewFake(testEpoch), slog.Default(), "statwatch/test")
+			_, err := buildSources(c, clock.NewFake(testEpoch), slog.Default(), "statusrelay/test")
 			if tc.want == "" {
 				if err != nil {
 					t.Fatalf("got %v, want nil", err)
@@ -88,14 +88,14 @@ func TestBuildSources(t *testing.T) {
 	}
 
 	cfg.Sources[0].Kind = "aws"
-	if _, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statwatch/test"); err == nil || !strings.Contains(err.Error(), "aws") {
+	if _, err := buildSources(cfg, clock.NewFake(testEpoch), slog.Default(), "statusrelay/test"); err == nil || !strings.Contains(err.Error(), "aws") {
 		t.Errorf("unknown kind: got %v, want error naming aws", err)
 	}
 }
 
 func TestBuildSinks(t *testing.T) {
 	cfg := fullConfig(t)
-	sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "statwatch/test")
+	sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "statusrelay/test")
 	if err != nil {
 		t.Fatalf("buildSinks: %v", err)
 	}

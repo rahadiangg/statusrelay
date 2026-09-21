@@ -24,7 +24,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/incident"
 )
 
 // Config is the fully resolved, validated configuration.
@@ -130,7 +130,7 @@ func defaults() Config {
 		SelfCheckInterval: time.Hour,
 		StaleAfter:        15 * time.Minute,
 		VanishGrace:       3,
-		StateFile:         "statwatch-state.json",
+		StateFile:         "statusrelay-state.json",
 		Notify:            Notify{Retry: Retry{Attempts: 3, Backoff: 2 * time.Second}},
 		HTTP:              HTTP{Listen: ":9101"},
 	}
