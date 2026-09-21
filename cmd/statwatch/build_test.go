@@ -29,6 +29,9 @@ sources:
     all_regions: true
     mirror_url: none
     min_severity: major
+  - id: alibaba-intl
+    kind: alibaba
+    regions: [{code: ap-southeast-5, name: "Indonesia (Jakarta)"}]
 notify:
   retry: {attempts: 2, backoff: 1s}
   telegram: [{name: tg, chat_id: "1", token_env: T}]
@@ -47,7 +50,8 @@ func TestBuildSources(t *testing.T) {
 	if err != nil {
 		t.Fatalf("buildSources: %v", err)
 	}
-	if len(srcs) != 2 || srcs[0].ID() != "huawei-intl" || srcs[0].Kind() != "huawei" || srcs[1].ID() != "huawei-nomirror" {
+	if len(srcs) != 3 || srcs[0].ID() != "huawei-intl" || srcs[0].Kind() != "huawei" || srcs[1].ID() != "huawei-nomirror" ||
+		srcs[2].ID() != "alibaba-intl" || srcs[2].Kind() != "alibaba" {
 		t.Errorf("got %d sources: %v", len(srcs), srcs)
 	}
 
@@ -97,8 +101,11 @@ func TestBuildFiltersAndOptions(t *testing.T) {
 	if len(f["huawei-nomirror"].Regions) != 0 || f["huawei-nomirror"].MinSeverity != incident.SeverityMajor {
 		t.Errorf("filter wrong: %+v", f["huawei-nomirror"])
 	}
+	if !f["alibaba-intl"].Regions["ap-southeast-5"] || !f["alibaba-intl"].IncludeGlobal {
+		t.Errorf("filter wrong: %+v", f["alibaba-intl"])
+	}
 	o := pollerOptions(cfg, clock.NewFake(testEpoch), slog.Default())
-	if o.Interval != cfg.PollInterval || o.VanishGrace != cfg.VanishGrace || len(o.Filters) != 2 || o.Clock == nil {
+	if o.Interval != cfg.PollInterval || o.VanishGrace != cfg.VanishGrace || len(o.Filters) != 3 || o.Clock == nil {
 		t.Errorf("options wrong: %+v", o)
 	}
 }
@@ -143,7 +150,7 @@ func TestRunExitsWhenPortIsTaken(t *testing.T) {
 
 func TestSourceIDsAndSinkNames(t *testing.T) {
 	cfg := fullConfig(t)
-	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror" {
+	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror,alibaba-intl" {
 		t.Errorf("sourceIDs: %s", got)
 	}
 	sinks, _ := buildSinks(cfg, clock.NewFake(testEpoch), "x")

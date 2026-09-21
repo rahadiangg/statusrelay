@@ -235,8 +235,20 @@ func (c *Config) validate() error {
 			bad("%s: duplicate id", where)
 		}
 		ids[s.ID] = true
-		if s.Kind != "huawei" {
-			bad("%s: unknown kind %q (supported: huawei)", where, s.Kind)
+		switch s.Kind {
+		case "huawei":
+		case "alibaba":
+			// Rejected rather than ignored: an operator who sets mirror_url
+			// believes failover exists, and a silently accepted key is how
+			// that belief survives until the day it matters.
+			if s.MirrorURL != "" {
+				bad("%s: mirror_url is not supported for kind alibaba (one host, no mirror)", where)
+			}
+			if s.AllowNonIntl {
+				bad("%s: allow_non_intl is meaningless for kind alibaba (one backend serves both sites)", where)
+			}
+		default:
+			bad("%s: unknown kind %q (supported: huawei, alibaba)", where, s.Kind)
 		}
 		if err := s.validateRegions(); err != nil {
 			bad("%s: %v", where, err)

@@ -26,6 +26,10 @@ metrics, notifiers).
   Fingerprint, and the pure Diff/Apply state machine. Imports nothing of ours;
   everything else imports it. Nothing outside it may depend on a concrete adapter.
 - `internal/incident/huawei` — the Huawei SHD adapter.
+- `internal/incident/alibaba` — the Alibaba Cloud Health Status adapter. Its own
+  traps: errors arrive as HTTP 200 with `success:false`; a bogus `regionId`
+  returns empty days at success; the catalogue endpoint needs a `Referer`;
+  Jakarta is `ap-southeast-5` there (`-1` Singapore, `-3` Kuala Lumpur).
 - `internal/incident/httpx` — hardened HTTP shared by adapters.
 - `internal/incident/canary` — `//go:build live` schema-drift suite.
 - `internal/poller` — the loop, failure accounting, and the sink bus.

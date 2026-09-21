@@ -34,6 +34,21 @@ sources:
     prefer_lang: en             # en | zh; falls back to the other when empty upstream
     allow_non_intl: false       # true only when deliberately watching the mainland site
 
+  - id: alibaba-intl
+    kind: alibaba
+    # base_url defaults to https://status.alibabacloud.com/api/status
+    # No mirror_url and no allow_non_intl: one host serves one backend, and
+    # both keys are rejected for this kind rather than silently ignored.
+    regions:
+      # Alibaba's codes differ from Huawei's. Indonesia (Jakarta) is
+      # ap-southeast-5; ap-southeast-1 is Singapore, ap-southeast-3 is
+      # Malaysia (Kuala Lumpur). The name is checked against the live
+      # catalogue at startup, so a wrong pairing refuses to run.
+      - {code: ap-southeast-5, name: "Indonesia (Jakarta)"}
+    include_global: true        # also covers events tagged "non-regional" (platform-wide)
+    min_severity: info          # ALARM grades as major, NOTIFICATION as info
+    prefer_lang: en             # sent as Accept-Language; product and region names follow it
+
 http:
   listen: ":9101"           # /metrics (Prometheus), /healthz (liveness), /readyz (503 while any source is blind). "" disables.
                             # No auth, no TLS, no incident text: counts and timestamps only. Bind to loopback if in doubt.

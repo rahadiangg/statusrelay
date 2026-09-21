@@ -6,6 +6,7 @@ import (
 
 	"github.com/rahadiangg/statwatch/internal/config"
 	"github.com/rahadiangg/statwatch/internal/incident"
+	"github.com/rahadiangg/statwatch/internal/incident/alibaba"
 	"github.com/rahadiangg/statwatch/internal/incident/huawei"
 	"github.com/rahadiangg/statwatch/internal/notify"
 	"github.com/rahadiangg/statwatch/internal/notify/smtp"
@@ -42,6 +43,19 @@ func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger, ua strin
 				opts = append(opts, huawei.WithMirror(sc.MirrorURL))
 			}
 			s, err := huawei.New(sc.ID, sc.BaseURL, opts...)
+			if err != nil {
+				return nil, fmt.Errorf("source %s: %w", sc.ID, err)
+			}
+			out = append(out, s)
+		case "alibaba":
+			// No mirror option: config rejects mirror_url for this kind.
+			s, err := alibaba.New(sc.ID, sc.BaseURL,
+				alibaba.WithRegions(sc.RegionCodes(), sc.RegionNames()),
+				alibaba.WithPreferLang(sc.PreferLang),
+				alibaba.WithLogger(log.With("source", sc.ID)),
+				alibaba.WithClock(clk),
+				alibaba.WithUserAgent(ua),
+			)
 			if err != nil {
 				return nil, fmt.Errorf("source %s: %w", sc.ID, err)
 			}

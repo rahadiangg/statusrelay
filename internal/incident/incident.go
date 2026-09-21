@@ -110,6 +110,11 @@ const (
 	AnomalyUnknownSeverity    = "unknown_severity"
 	AnomalySilentMtimeBump    = "silent_mtime_bump"
 	AnomalyCountMismatch      = "count_mismatch"
+	// AnomalyStatusConflict means the list a record appeared in disagrees with
+	// the record's own status field (an "open" row with an end time, or a
+	// "resolved" row without one). Membership decides; the field is only a
+	// witness, and this is how its testimony is heard.
+	AnomalyStatusConflict = "status_conflict"
 )
 
 // Region is one region in a provider's inventory.

@@ -60,6 +60,7 @@ type Client struct {
 	retries   int
 	backoff   time.Duration
 	forceIPv4 bool
+	headers   map[string]string
 }
 
 // Option configures a Client.
@@ -85,6 +86,21 @@ func WithBackoff(d time.Duration) Option { return func(c *Client) { c.backoff = 
 
 // WithHTTPClient replaces the underlying client entirely. Primarily for tests.
 func WithHTTPClient(h *http.Client) Option { return func(c *Client) { c.http = h } }
+
+// WithHeader adds a fixed header to every request.
+//
+// It exists for Accept-Language: at least one upstream localises product and
+// region names server-side from that header and defaults to Chinese without
+// it, so a client that cannot send it reconciles configured region names
+// against strings the operator cannot read.
+func WithHeader(key, value string) Option {
+	return func(c *Client) {
+		if c.headers == nil {
+			c.headers = make(map[string]string)
+		}
+		c.headers[key] = value
+	}
+}
 
 // New builds a Client with defaults suited to polling a public status feed.
 func New(opts ...Option) *Client {
@@ -211,6 +227,9 @@ func (c *Client) once(ctx context.Context, u string, v any) (Result, error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Encoding", "gzip")
 	req.Header.Set("User-Agent", c.ua)
+	for k, v := range c.headers {
+		req.Header.Set(k, v)
+	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {

@@ -430,3 +430,31 @@ func TestJoinPathRejectsBadBase(t *testing.T) {
 		t.Errorf("got %v, want ErrBadRequest", err)
 	}
 }
+
+// A fixed header has to survive the retry path too: a localised name on the
+// first attempt and a Chinese one on the retry would make region reconciliation
+// flap with the network.
+func TestWithHeaderIsSentOnEveryRequest(t *testing.T) {
+	var seen []string
+	c, srv := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		seen = append(seen, r.Header.Get("Accept-Language"))
+		if len(seen) == 1 {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[]`))
+	}, WithRetries(1), WithBackoff(0), WithHeader("Accept-Language", "en"))
+
+	if _, err := c.GetJSON(t.Context(), srv.URL, nil); err != nil {
+		t.Fatalf("GetJSON: %v", err)
+	}
+	if len(seen) != 2 {
+		t.Fatalf("made %d calls, want 2", len(seen))
+	}
+	for i, got := range seen {
+		if got != "en" {
+			t.Errorf("request %d Accept-Language = %q, want %q", i, got, "en")
+		}
+	}
+}

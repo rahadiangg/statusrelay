@@ -22,6 +22,10 @@ sources:
   - id: huawei-all
     kind: huawei
     all_regions: true
+  - id: alibaba-intl
+    kind: alibaba
+    regions:
+      - {code: ap-southeast-5, name: "Indonesia (Jakarta)"}
 
 notify:
   retry: {attempts: 5, backoff: 1s}
