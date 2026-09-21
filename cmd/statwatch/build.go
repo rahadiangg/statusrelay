@@ -63,6 +63,7 @@ func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger, ua strin
 				tencent.WithRegions(sc.RegionCodes(), sc.RegionNames()),
 				tencent.WithLogger(log.With("source", sc.ID)),
 				tencent.WithClock(clk),
+				tencent.WithUserAgent(ua),
 			)
 			if err != nil {
 				return nil, fmt.Errorf("source %s: %w", sc.ID, err)

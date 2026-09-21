@@ -70,7 +70,7 @@ func TestBuildSources(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			c := fullConfig(t)
 			tc.set(&c.Sources[2])
-			_, err := buildSources(c, clock.NewFake(testEpoch), slog.Default())
+			_, err := buildSources(c, clock.NewFake(testEpoch), slog.Default(), "statwatch/test")
 			if tc.want == "" {
 				if err != nil {
 					t.Fatalf("got %v, want nil", err)

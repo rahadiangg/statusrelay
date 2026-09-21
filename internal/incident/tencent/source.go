@@ -33,6 +33,7 @@ type Source struct {
 
 	regionCodes []string
 	regionNames []string
+	userAgent   string
 
 	mu           sync.Mutex
 	catalogue    *Catalogue
@@ -61,6 +62,12 @@ func WithRegions(c, n []string) Option {
 // WithHTTPClient replaces the HTTP layer. Primarily for tests.
 func WithHTTPClient(d doer) Option { return func(s *Source) { s.client.http = d } }
 
+// WithUserAgent sets the User-Agent sent upstream. Ignored when WithHTTPClient
+// supplies the transport. Without it every release identifies as statwatch/dev,
+// which is useless to whoever reads the upstream's access log when deciding
+// what to block.
+func WithUserAgent(ua string) Option { return func(s *Source) { s.userAgent = ua } }
+
 // New builds a Source. id is the instance name, base is the dashboard URL.
 func New(id, base string, opts ...Option) (*Source, error) {
 	if strings.TrimSpace(base) == "" {
@@ -68,7 +75,7 @@ func New(id, base string, opts ...Option) (*Source, error) {
 	}
 	s := &Source{
 		id:     id,
-		client: &client{base: base, http: httpx.New()},
+		client: &client{base: base},
 		log:    slog.Default(),
 		clock:  clock.System{},
 		// Optimistic until the poller's first SelfCheck says otherwise.
@@ -76,6 +83,13 @@ func New(id, base string, opts ...Option) (*Source, error) {
 	}
 	for _, o := range opts {
 		o(s)
+	}
+	if s.client.http == nil {
+		var hopts []httpx.Option
+		if s.userAgent != "" {
+			hopts = append(hopts, httpx.WithUserAgent(s.userAgent))
+		}
+		s.client.http = httpx.New(hopts...)
 	}
 	return s, nil
 }
