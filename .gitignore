@@ -7,3 +7,4 @@ statusrelay-state.json*
 statusrelay.yaml
 .env
 .DS_Store
+.claude/worktrees/
