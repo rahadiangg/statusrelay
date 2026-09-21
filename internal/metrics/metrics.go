@@ -39,6 +39,7 @@ var AnomalyKinds = []string{
 	incident.AnomalyIDReuse, incident.AnomalyProgressShrank, incident.AnomalyProgressOutOfOrder,
 	incident.AnomalyFutureTimestamp, incident.AnomalyBadTimestamp, incident.AnomalyUnknownSeverity,
 	incident.AnomalySilentMtimeBump, incident.AnomalyCountMismatch, incident.AnomalyStatusConflict,
+	incident.AnomalyUnknownStatus,
 }
 
 var statuses = []incident.Status{incident.StatusOpen, incident.StatusResolved, incident.StatusUnknown}

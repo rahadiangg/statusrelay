@@ -49,6 +49,21 @@ sources:
     min_severity: info          # ALARM grades as major, NOTIFICATION as info
     prefer_lang: en             # sent as Accept-Language; product and region names follow it
 
+  # - id: tencent-intl
+  #   kind: tencent
+  #   # base_url defaults to https://status.tencentcloud.com (no mirror exists;
+  #   # mirror_url, prefer_lang other than en, and allow_non_intl are rejected).
+  #   regions:
+  #     # Codes are human-readable here (ap-jakarta, ap-singapore, ap-seoul,
+  #     # eu-frankfurt, na-ashburn, ...). Unknown codes are NOT an error
+  #     # upstream — the API answers them with an empty grid at HTTP 200 —
+  #     # so statwatch checks them against the live catalogue at startup.
+  #     - {code: ap-jakarta, name: Jakarta}
+  #   # services: [CVM, CBS, CLB]  # product ids, upper-cased
+  #   include_global: true        # "non-regional" events (platform-wide) count as global
+  #   min_severity: info          # the API has no severity: ongoing events are
+  #                               # "unknown" (always alert), notices and drills are "info"
+
 http:
   listen: ":9101"           # /metrics (Prometheus), /healthz (liveness), /readyz (503 while any source is blind). "" disables.
                             # No auth, no TLS, no incident text: counts and timestamps only. Bind to loopback if in doubt.

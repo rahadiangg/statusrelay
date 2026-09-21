@@ -1,0 +1,518 @@
+{
+    "Response": {
+        "RequestId": "ecd09bf7-a1b4-4214-be38-9acbc255a3ba",
+        "Data": {
+            "Total": 8,
+            "List": [
+                {
+                    "EventCode": "93a75460e1115154b8cad11828c34ba7",
+                    "Title": "Problems with Cloud Block Storage etc. detected in Seoul",
+                    "StartTime": "2026-04-21 13:38:00",
+                    "EndTime": "2026-04-21 20:10:00",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2026-04-21 15:10:11",
+                    "UpdateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "UpdateTime": "2026-04-21 20:20:01",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1145196",
+                    "ProductList": [
+                        {
+                            "ProductId": "cvm",
+                            "ProductName": "Cloud Virtual Machine"
+                        },
+                        {
+                            "ProductId": "lighthouse",
+                            "ProductName": " Tencent Cloud Lighthouse"
+                        },
+                        {
+                            "ProductId": "cbs",
+                            "ProductName": "Cloud Block Storage"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "ap-seoul",
+                            "RegionName": "Seoul"
+                        }
+                    ],
+                    "TimeRegion": "Asia/Seoul"
+                },
+                {
+                    "EventCode": "8649c64bb761ad90b7944eeef1e279b6",
+                    "Title": "Problems with Anti-DDoS detected ",
+                    "StartTime": "2026-01-23 10:42:18",
+                    "EndTime": "2026-01-23 10:50:00",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2026-01-23 11:03:17",
+                    "UpdateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "UpdateTime": "2026-01-23 13:30:33",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1142463",
+                    "ProductList": [
+                        {
+                            "ProductId": "ddos",
+                            "ProductName": "Anti-DDoS"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "non-regional",
+                            "RegionName": "Non-Regional"
+                        }
+                    ],
+                    "TimeRegion": ""
+                },
+                {
+                    "EventCode": "c635650cb610f484ec29e59067dc8e90",
+                    "Title": "Problems with Cloud Virtual Machine detected in Shanghai",
+                    "StartTime": "2026-01-21 12:15:15",
+                    "EndTime": "2026-01-21 12:15:15",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2026-01-21 14:14:27",
+                    "UpdateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "UpdateTime": "2026-01-21 14:18:41",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1142384",
+                    "ProductList": [
+                        {
+                            "ProductId": "cvm",
+                            "ProductName": "Cloud Virtual Machine"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "ap-shanghai",
+                            "RegionName": "Shanghai"
+                        }
+                    ],
+                    "TimeRegion": "Asia/Shanghai"
+                },
+                {
+                    "EventCode": "fd61b1ba7f89c71616cd35df88a7c555",
+                    "Title": "Problems with Tencent Cloud AI Digital Human detected in Guangzhou",
+                    "StartTime": "2025-10-17 08:53:00",
+                    "EndTime": "2025-10-17 10:00:00",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2025-10-17 09:17:00",
+                    "UpdateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "UpdateTime": "2025-10-17 10:13:04",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1138982",
+                    "ProductList": [
+                        {
+                            "ProductId": "ivh",
+                            "ProductName": "Tencent Cloud AI Digital Human"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "ap-guangzhou",
+                            "RegionName": "Guangzhou"
+                        }
+                    ],
+                    "TimeRegion": "Asia/Shanghai"
+                },
+                {
+                    "EventCode": "4cf006e065d54f06f8e651417c8b12a9",
+                    "Title": "Problems with Cloud Data Warehouse etc. detected in Virginia",
+                    "StartTime": "2025-10-15 11:05:40",
+                    "EndTime": "2025-10-15 13:40:00",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2025-10-15 11:39:41",
+                    "UpdateBy": "jessiejsun",
+                    "UpdateTime": "2025-10-15 15:05:05",
+                    "IsEnable": true,
+                    "DotStatus": 2,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1138921",
+                    "ProductList": [
+                        {
+                            "ProductId": "cvm",
+                            "ProductName": "Cloud Virtual Machine"
+                        },
+                        {
+                            "ProductId": "trocket",
+                            "ProductName": "TDMQ for RocketMQ"
+                        },
+                        {
+                            "ProductId": "vpc",
+                            "ProductName": "Virtual Private Cloud"
+                        },
+                        {
+                            "ProductId": "emr",
+                            "ProductName": "Elastic MapReduce"
+                        },
+                        {
+                            "ProductId": "cdwch",
+                            "ProductName": "Cloud Data Warehouse"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "na-ashburn",
+                            "RegionName": "Virginia"
+                        }
+                    ],
+                    "TimeRegion": "America/New_York"
+                },
+                {
+                    "EventCode": "e2d95c66d1a1d20fab37c75df780b424",
+                    "Title": "Problems with NAT Gateway detected in in Frankfurt",
+                    "StartTime": "2025-05-09 06:08:00",
+                    "EndTime": "2025-05-09 06:29:00",
+                    "CreateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "CreateTime": "2025-05-09 07:34:46",
+                    "UpdateBy": "\u81ea\u52a8\u6c47\u805a",
+                    "UpdateTime": "2025-05-09 07:35:38",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 1,
+                    "IsExercise": false,
+                    "RelatedId": "1746776086",
+                    "ProductList": [
+                        {
+                            "ProductId": "nat",
+                            "ProductName": "NAT Gateway"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "eu-frankfurt",
+                            "RegionName": "Frankfurt"
+                        }
+                    ],
+                    "TimeRegion": "Europe/Berlin"
+                },
+                {
+                    "EventCode": "934d4c8e9738f8c19bc2ec5677b07a0e",
+                    "Title": "Network-Related Issues in the Guangzhou Region",
+                    "StartTime": "2025-04-02 07:50:34",
+                    "EndTime": "2025-04-02 11:58:00",
+                    "CreateBy": "jessiejsun",
+                    "CreateTime": "2025-04-03 06:29:19",
+                    "UpdateBy": "jessiejsun",
+                    "UpdateTime": "2025-04-23 08:22:30",
+                    "IsEnable": true,
+                    "DotStatus": 1,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 0,
+                    "IsExercise": false,
+                    "RelatedId": "1744114280",
+                    "ProductList": [
+                        {
+                            "ProductId": "cvm",
+                            "ProductName": "Cloud Virtual Machine"
+                        },
+                        {
+                            "ProductId": "scf",
+                            "ProductName": "Serverless Cloud Function"
+                        },
+                        {
+                            "ProductId": "cfs",
+                            "ProductName": "Cloud File Storage"
+                        },
+                        {
+                            "ProductId": "cbs",
+                            "ProductName": "Cloud Block Storage"
+                        },
+                        {
+                            "ProductId": "cls",
+                            "ProductName": "Cloud Log Service"
+                        },
+                        {
+                            "ProductId": "tke",
+                            "ProductName": "Tencent Kubernetes Engine"
+                        },
+                        {
+                            "ProductId": "cynosdb",
+                            "ProductName": "Cloud Native Database TDSQL-C"
+                        },
+                        {
+                            "ProductId": "cdb",
+                            "ProductName": "TencentDB for MySQL"
+                        },
+                        {
+                            "ProductId": "tdsql",
+                            "ProductName": "TencentDB for MariaDB"
+                        },
+                        {
+                            "ProductId": "postgres",
+                            "ProductName": "TencentDB for PostgreSQL"
+                        },
+                        {
+                            "ProductId": "tpulsar",
+                            "ProductName": "TDMQ for Pulsar"
+                        },
+                        {
+                            "ProductId": "dcdb",
+                            "ProductName": "TDSQL for MySQL"
+                        },
+                        {
+                            "ProductId": "crs",
+                            "ProductName": "Tencent Cloud Distributed Cache"
+                        },
+                        {
+                            "ProductId": "ctsdb",
+                            "ProductName": "TencentDB for CTSDB"
+                        },
+                        {
+                            "ProductId": "vpc",
+                            "ProductName": "Virtual Private Cloud"
+                        },
+                        {
+                            "ProductId": "clb",
+                            "ProductName": "Cloud Load Balancer"
+                        },
+                        {
+                            "ProductId": "tbase",
+                            "ProductName": "TDSQL PostgreSQL"
+                        },
+                        {
+                            "ProductId": "waf",
+                            "ProductName": "Web Application Firewall"
+                        },
+                        {
+                            "ProductId": "emr",
+                            "ProductName": "Elastic MapReduce"
+                        },
+                        {
+                            "ProductId": "es",
+                            "ProductName": "Elasticsearch Service"
+                        },
+                        {
+                            "ProductId": "cdwch",
+                            "ProductName": "Cloud Data Warehouse"
+                        },
+                        {
+                            "ProductId": "dlc",
+                            "ProductName": "Data Lake Compute"
+                        },
+                        {
+                            "ProductId": "faceid",
+                            "ProductName": "eKYC"
+                        },
+                        {
+                            "ProductId": "eip",
+                            "ProductName": "Elastic IP"
+                        },
+                        {
+                            "ProductId": "asr",
+                            "ProductName": "Automatic Speech Recognition"
+                        },
+                        {
+                            "ProductId": "ckafka",
+                            "ProductName": "Message Queue CKafka"
+                        },
+                        {
+                            "ProductId": "sms",
+                            "ProductName": "Short Message Service"
+                        },
+                        {
+                            "ProductId": "trtc",
+                            "ProductName": "Tencent Real-Time Communication"
+                        },
+                        {
+                            "ProductId": "css",
+                            "ProductName": "Cloud Streaming Services"
+                        },
+                        {
+                            "ProductId": "vod",
+                            "ProductName": "Video on Demand"
+                        },
+                        {
+                            "ProductId": "apm",
+                            "ProductName": "Application Performance Management"
+                        },
+                        {
+                            "ProductId": "oceanus",
+                            "ProductName": "Oceanus"
+                        },
+                        {
+                            "ProductId": "tm",
+                            "ProductName": "Tencent VooV Meeting"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "ap-guangzhou",
+                            "RegionName": "Guangzhou"
+                        },
+                        {
+                            "RegionId": "non-regional",
+                            "RegionName": "Non-Regional"
+                        }
+                    ],
+                    "TimeRegion": ""
+                },
+                {
+                    "EventCode": "127127c1-ddad-47ab-b694-2b626006fc79",
+                    "Title": "Tencent Cloud Console Service Abnormality",
+                    "StartTime": "2024-04-08 07:23:00",
+                    "EndTime": "2024-04-08 08:50:00",
+                    "CreateBy": "jessiejsun",
+                    "CreateTime": "2024-05-27 03:03:05",
+                    "UpdateBy": "pumbaahu",
+                    "UpdateTime": "2024-06-06 08:05:01",
+                    "IsEnable": true,
+                    "DotStatus": 2,
+                    "BelongSite": 1,
+                    "Status": 1,
+                    "Source": 0,
+                    "IsExercise": false,
+                    "RelatedId": "",
+                    "ProductList": [
+                        {
+                            "ProductId": "cvm",
+                            "ProductName": "Cloud Virtual Machine"
+                        },
+                        {
+                            "ProductId": "scf",
+                            "ProductName": "Serverless Cloud Function"
+                        },
+                        {
+                            "ProductId": "cfs",
+                            "ProductName": "Cloud File Storage"
+                        },
+                        {
+                            "ProductId": "cbs",
+                            "ProductName": "Cloud Block Storage"
+                        },
+                        {
+                            "ProductId": "cls",
+                            "ProductName": "Cloud Log Service"
+                        },
+                        {
+                            "ProductId": "cdb",
+                            "ProductName": "TencentDB for MySQL"
+                        },
+                        {
+                            "ProductId": "crs",
+                            "ProductName": "Tencent Cloud Distributed Cache"
+                        },
+                        {
+                            "ProductId": "dts",
+                            "ProductName": "Data Transmission Service"
+                        },
+                        {
+                            "ProductId": "clb",
+                            "ProductName": "Cloud Load Balancer"
+                        },
+                        {
+                            "ProductId": "nat",
+                            "ProductName": "NAT Gateway"
+                        },
+                        {
+                            "ProductId": "eip",
+                            "ProductName": "Elastic IP"
+                        },
+                        {
+                            "ProductId": "ckafka",
+                            "ProductName": "Message Queue CKafka"
+                        }
+                    ],
+                    "RegionList": [
+                        {
+                            "RegionId": "ap-bangkok",
+                            "RegionName": "Bangkok"
+                        },
+                        {
+                            "RegionId": "ap-beijing",
+                            "RegionName": "Beijing"
+                        },
+                        {
+                            "RegionId": "ap-chengdu",
+                            "RegionName": "Chengdu"
+                        },
+                        {
+                            "RegionId": "ap-chongqing",
+                            "RegionName": "Chongqing"
+                        },
+                        {
+                            "RegionId": "ap-guangzhou",
+                            "RegionName": "Guangzhou"
+                        },
+                        {
+                            "RegionId": "ap-hongkong",
+                            "RegionName": "Hong Kong"
+                        },
+                        {
+                            "RegionId": "ap-jakarta",
+                            "RegionName": "Jakarta"
+                        },
+                        {
+                            "RegionId": "ap-mumbai",
+                            "RegionName": "Mumbai"
+                        },
+                        {
+                            "RegionId": "ap-nanjing",
+                            "RegionName": "Nanjing"
+                        },
+                        {
+                            "RegionId": "ap-seoul",
+                            "RegionName": "Seoul"
+                        },
+                        {
+                            "RegionId": "ap-shanghai",
+                            "RegionName": "Shanghai"
+                        },
+                        {
+                            "RegionId": "ap-singapore",
+                            "RegionName": "Singapore"
+                        },
+                        {
+                            "RegionId": "ap-tokyo",
+                            "RegionName": "Tokyo"
+                        },
+                        {
+                            "RegionId": "eu-frankfurt",
+                            "RegionName": "Frankfurt"
+                        },
+                        {
+                            "RegionId": "na-ashburn",
+                            "RegionName": "Virginia"
+                        },
+                        {
+                            "RegionId": "na-siliconvalley",
+                            "RegionName": "Silicon Valley"
+                        },
+                        {
+                            "RegionId": "na-toronto",
+                            "RegionName": "Toronto"
+                        },
+                        {
+                            "RegionId": "sa-saopaulo",
+                            "RegionName": "Sao Paulo"
+                        }
+                    ],
+                    "TimeRegion": ""
+                }
+            ]
+        }
+    }
+}

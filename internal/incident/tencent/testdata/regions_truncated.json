@@ -1,0 +1,61 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "AreaDetailList": [
+        {
+          "AreaName": "America",
+          "RegionList": [
+            {
+              "RegionName": "Virginia",
+              "RegionId": "na-ashburn",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Silicon Valley",
+              "RegionId": "na-siliconvalley",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Sao Paulo",
+              "RegionId": "sa-saopaulo",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        },
+        {
+          "AreaName": "Asia",
+          "RegionList": [
+            {
+              "RegionName": "Bangkok",
+              "RegionId": "ap-bangkok",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Jakarta",
+              "RegionId": "ap-jakarta",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Seoul",
+              "RegionId": "ap-seoul",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Singapore",
+              "RegionId": "ap-singapore",
+              "EventsIn": false
+            },
+            {
+              "RegionName": "Tokyo",
+              "RegionId": "ap-tokyo",
+              "EventsIn": false
+            }
+          ],
+          "AreaId": ""
+        }
+      ]
+    }
+  }
+}

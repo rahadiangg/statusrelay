@@ -115,6 +115,7 @@ const (
 	// "resolved" row without one). Membership decides; the field is only a
 	// witness, and this is how its testimony is heard.
 	AnomalyStatusConflict = "status_conflict"
+	AnomalyUnknownStatus  = "unknown_status"
 )
 
 // Region is one region in a provider's inventory.

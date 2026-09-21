@@ -1,0 +1,78 @@
+{
+  "Response": {
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Data": {
+      "Total": 2,
+      "List": [
+        {
+          "EventCode": "0000000000000000000000000000aa01",
+          "Title": "Problems with Cloud Virtual Machine detected in Jakarta",
+          "StartTime": "2026-09-20 22:00:00",
+          "EndTime": "",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-09-20 22:30:00",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 2,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-jakarta",
+              "RegionName": "Jakarta"
+            }
+          ],
+          "TimeRegion": "Asia/Jakarta"
+        },
+        {
+          "EventCode": "93a75460e1115154b8cad11828c34ba7",
+          "Title": "Problems with Cloud Block Storage etc. detected in Seoul",
+          "StartTime": "2026-04-21 13:38:00",
+          "EndTime": "2026-04-21 20:10:00",
+          "CreateBy": "自动汇聚",
+          "CreateTime": "2026-04-21 15:10:11",
+          "UpdateBy": "自动汇聚",
+          "UpdateTime": "2026-04-21 20:20:01",
+          "IsEnable": true,
+          "DotStatus": 1,
+          "BelongSite": 1,
+          "Status": 1,
+          "Source": 1,
+          "IsExercise": false,
+          "RelatedId": "1145196",
+          "ProductList": [
+            {
+              "ProductId": "cvm",
+              "ProductName": "Cloud Virtual Machine"
+            },
+            {
+              "ProductId": "lighthouse",
+              "ProductName": " Tencent Cloud Lighthouse"
+            },
+            {
+              "ProductId": "cbs",
+              "ProductName": "Cloud Block Storage"
+            }
+          ],
+          "RegionList": [
+            {
+              "RegionId": "ap-seoul",
+              "RegionName": "Seoul"
+            }
+          ],
+          "TimeRegion": "Asia/Seoul"
+        }
+      ]
+    }
+  }
+}

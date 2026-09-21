@@ -236,7 +236,7 @@ func (c *Config) validate() error {
 		}
 		ids[s.ID] = true
 		switch s.Kind {
-		case "huawei":
+		case "huawei", "tencent":
 		case "alibaba":
 			// Rejected rather than ignored: an operator who sets mirror_url
 			// believes failover exists, and a silently accepted key is how
@@ -248,7 +248,7 @@ func (c *Config) validate() error {
 				bad("%s: allow_non_intl is meaningless for kind alibaba (one backend serves both sites)", where)
 			}
 		default:
-			bad("%s: unknown kind %q (supported: huawei, alibaba)", where, s.Kind)
+			bad("%s: unknown kind %q (supported: huawei, alibaba, tencent)", where, s.Kind)
 		}
 		if err := s.validateRegions(); err != nil {
 			bad("%s: %v", where, err)

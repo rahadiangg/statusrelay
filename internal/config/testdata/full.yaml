@@ -26,6 +26,11 @@ sources:
     kind: alibaba
     regions:
       - {code: ap-southeast-5, name: "Indonesia (Jakarta)"}
+  - id: tencent-intl
+    kind: tencent
+    regions:
+      - {code: ap-jakarta, name: Jakarta}
+    services: [cvm]
 
 notify:
   retry: {attempts: 5, backoff: 1s}

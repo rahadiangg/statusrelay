@@ -1,0 +1,9 @@
+{
+  "Response": {
+    "RequestId": "x",
+    "Error": {
+      "Code": "Throttled",
+      "Message": "slow down"
+    }
+  }
+}
