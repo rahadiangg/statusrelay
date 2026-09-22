@@ -19,6 +19,7 @@ const futureSlack = 10 * time.Minute
 // never the incident.
 type mapper struct {
 	sourceID  string
+	page      func(id string) string
 	now       time.Time
 	anomalies []incident.Warning
 
@@ -90,6 +91,7 @@ func (m *mapper) mapEvent(w *wireEvent, code string) incident.Record {
 
 	r := incident.Record{
 		Key:         incident.Key{SourceID: m.sourceID, ProviderID: code},
+		URL:         m.page(code),
 		Title:       title,
 		TitleLang:   lang,
 		Titles:      titles,

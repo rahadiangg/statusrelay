@@ -82,28 +82,29 @@ func checkConfig(args []string, stdout, stderr io.Writer, getenv func(string) st
 				regions += " (no names given: codes are NOT verified against the catalogue)"
 			}
 		}
-		fmt.Fprintf(stdout, "source %s (%s): %s, min severity %s, services %v\n",
-			s.ID, s.Kind, regions, s.Severity, s.Services)
+		fmt.Fprintf(stdout, "source %s (%s, shown as %q): %s, min severity %s, services %v\n",
+			s.ID, s.Kind, s.DisplayName, regions, s.Severity, s.Services)
 	}
 	if cfg.Notify.LogOnly {
 		fmt.Fprintln(stdout, "notify: LOG ONLY — no alerts will be sent")
 	}
+	fmt.Fprintf(stdout, "notify: timestamps in %s\n", cfg.Notify.Location)
 	for _, t := range cfg.Notify.Telegram {
-		fmt.Fprintf(stdout, "notify telegram/%s: chat %s, token from $%s (%d chars)\n", t.Name, t.ChatID, t.TokenEnv, len(t.Token))
+		fmt.Fprintf(stdout, "notify telegram/%s: chat %s, token from $%s (%d chars); routes %s\n", t.Name, t.ChatID, t.TokenEnv, len(t.Token), t.Route)
 	}
 	for _, m := range cfg.Notify.SMTP {
 		auth := "no auth"
 		if m.Username != "" {
 			auth = fmt.Sprintf("user %s, password from $%s", m.Username, m.PasswordEnv)
 		}
-		fmt.Fprintf(stdout, "notify smtp/%s: %s from %s to %v, %s\n", m.Name, m.Addr, m.From, m.To, auth)
+		fmt.Fprintf(stdout, "notify smtp/%s: %s from %s to %v, %s; routes %s\n", m.Name, m.Addr, m.From, m.To, auth, m.Route)
 	}
 	for _, w := range cfg.Notify.Webhook {
 		sig := "unsigned"
 		if w.SecretEnv != "" {
 			sig = "signed with $" + w.SecretEnv
 		}
-		fmt.Fprintf(stdout, "notify webhook/%s: %s, %s, %d header(s)\n", w.Name, w.URL, sig, len(w.Headers))
+		fmt.Fprintf(stdout, "notify webhook/%s: %s, %s, %d header(s); routes %s\n", w.Name, w.URL, sig, len(w.Headers), w.Route)
 	}
 	return 0
 }

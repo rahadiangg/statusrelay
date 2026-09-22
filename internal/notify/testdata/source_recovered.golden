@@ -1,11 +1,10 @@
-Subject: [statusrelay] SOURCE RECOVERED critical: statusrelay can see huawei-intl again (blind for 23m0s)
+Subject: [statusrelay] SOURCE RECOVERED critical · huawei-intl
 
-SOURCE RECOVERED · critical · huawei-intl #statusrelay
+SOURCE RECOVERED · critical · huawei-intl
 statusrelay can see huawei-intl again (blind for 23m0s)
 Status: resolved
 Published: 2026-09-21 10:07 UTC
 Ended: 2026-09-21 10:30 UTC
-Regions: global (no region published)
 
 Update 2026-09-21 10:30 UTC:
   A complete snapshot was received. Incidents published while blind, if any, will be reported now.

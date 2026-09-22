@@ -59,6 +59,13 @@ type Event struct {
 	// A reader deserves to know that "new" here may mean "new to us" rather
 	// than "just happened".
 	ColdStart bool
+
+	// Watched is the subset of Record.Scope that matched the source's filter:
+	// the regions the operator actually asked about, for a subject line that
+	// says "AP-Jakarta (ECS)" rather than the provider's five-region title.
+	// nil when the event was built without a filter; renderers fall back to
+	// the full scope.
+	Watched []Scope
 }
 
 // Stored is what we persist per record between polls.
@@ -122,6 +129,16 @@ func identityOf(r Record) string {
 // because this is the code whose bugs are invisible in production — a wrong
 // answer here is silence, and silence is what the service is supposed to detect.
 func Diff(prev map[Key]Stored, snap *Snapshot, o DiffOpts) []Event {
+	out := diff(prev, snap, o)
+	for i := range out {
+		// Non-nil even when empty, so a renderer can tell "nothing of ours
+		// is affected" from "built without a filter".
+		out[i].Watched = append([]Scope{}, o.Filter.MatchedScopes(out[i].Record)...)
+	}
+	return out
+}
+
+func diff(prev map[Key]Stored, snap *Snapshot, o DiffOpts) []Event {
 	var out []Event
 	seen := make(map[Key]bool, len(snap.Open)+len(snap.Recent))
 

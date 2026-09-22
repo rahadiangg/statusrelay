@@ -135,7 +135,9 @@ func TestUnknownPathAndMethod(t *testing.T) {
 
 func TestListenAndServeLifecycle(t *testing.T) {
 	reg := prometheus.NewRegistry()
-	s := New("127.0.0.1:0", reg, healthy, Thresholds{LoopStale: time.Minute}, nil)
+	// The fake clock matters: with the system clock the fixed test epoch is
+	// "stalled" the moment the calendar moves past it.
+	s := New("127.0.0.1:0", reg, healthy, Thresholds{LoopStale: time.Minute, Clock: clock.NewFake(testEpoch)}, nil)
 	if err := s.Listen(); err != nil {
 		t.Fatal(err)
 	}

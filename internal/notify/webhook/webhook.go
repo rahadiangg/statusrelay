@@ -41,6 +41,7 @@ type Notifier struct {
 	headers map[string]string
 	http    *http.Client
 	ua      string
+	render  notify.Renderer
 }
 
 // Option configures a Notifier.
@@ -61,6 +62,10 @@ func WithTimeout(d time.Duration) Option { return func(n *Notifier) { n.http.Tim
 
 // WithUserAgent sets the User-Agent header.
 func WithUserAgent(ua string) Option { return func(n *Notifier) { n.ua = ua } }
+
+// WithRenderer sets how events are turned into text (timezone, provider
+// names). The zero Renderer is UTC with raw source ids.
+func WithRenderer(r notify.Renderer) Option { return func(n *Notifier) { n.render = r } }
 
 // New builds a Notifier.
 //
@@ -114,8 +119,11 @@ type Payload struct {
 	NewUpdates []Update   `json:"new_updates"`
 	Added      []string   `json:"added"`
 	Removed    []string   `json:"removed"`
-	Subject    string     `json:"subject"`
-	Text       string     `json:"text"`
+	// URL is the provider's page for the record; empty for health events.
+	// Additive since schema 1; receivers must tolerate unknown fields.
+	URL     string `json:"url"`
+	Subject string `json:"subject"`
+	Text    string `json:"text"`
 }
 
 // Scope is one affected region.
@@ -140,9 +148,14 @@ type Update struct {
 
 // Build converts an event into the wire document. Exported so the config
 // phase can render a sample and so receivers' tests can construct one.
-func Build(ev incident.Event) Payload {
+// Build renders the payload with the zero Renderer.
+func Build(ev incident.Event) Payload { return BuildWith(notify.Renderer{}, ev) }
+
+// BuildWith renders the payload with rd, so text fields carry the operator's
+// timezone and provider names like every other transport.
+func BuildWith(rd notify.Renderer, ev incident.Event) Payload {
 	r := ev.Record
-	m := notify.Render(ev)
+	m := rd.Render(ev)
 	p := Payload{
 		Schema:     Schema,
 		EventID:    notify.EventID(ev),
@@ -164,6 +177,7 @@ func Build(ev incident.Event) Payload {
 		NewUpdates: []Update{},
 		Added:      nonNil(ev.Added),
 		Removed:    nonNil(ev.Removed),
+		URL:        r.URL,
 		Subject:    m.Subject,
 		Text:       m.Body,
 	}
@@ -201,7 +215,7 @@ func nonNil(s []string) []string {
 
 // Send posts one event.
 func (n *Notifier) Send(ctx context.Context, ev incident.Event) error {
-	body, err := json.Marshal(Build(ev))
+	body, err := json.Marshal(BuildWith(n.render, ev))
 	if err != nil {
 		return fmt.Errorf("%w: encoding payload: %v", notify.ErrPermanent, err)
 	}

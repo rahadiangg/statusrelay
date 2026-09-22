@@ -33,6 +33,7 @@ sources:
     min_severity: info          # info | minor | major | critical; unknown severities always alert
     prefer_lang: en             # en | zh; falls back to the other when empty upstream
     allow_non_intl: false       # true only when deliberately watching the mainland site
+    # display_name: Huawei Cloud  # what notifications call this source; defaults from kind
 
   - id: alibaba-intl
     kind: alibaba
@@ -70,14 +71,26 @@ http:
 
 notify:
   # log_only: true    # first deploy / dry run: events are logged, nobody is paged
+  timezone: UTC       # IANA zone for timestamps in messages, e.g. Asia/Jakarta
   retry:
     attempts: 3       # total tries per delivery
     backoff: 2s       # doubles each retry; a 429's retry-after overrides it
+
+  # Routing: every sink takes optional min_severity, kinds and sources. An
+  # absent key means no restriction, so a sink with none receives everything.
+  # An explicitly empty list is an error. Kinds are exact and lower-case:
+  #   new updated minor_updated scope_changed resolved resolved_inferred
+  #   reopened missed_and_resolved updated_after_resolve vanished scope_exited
+  #   source_blind source_recovered
+  # Unknown severities always pass a min_severity floor. At least one sink
+  # must accept source_blind for every source, or statusrelay refuses to
+  # start: a feed that dies silently is the failure this tool exists to catch.
   telegram:
     - name: oncall
       chat_id: "-1001234567890"     # numeric id or @channelusername; quote negative ids
       token_env: STATUSRELAY_TELEGRAM_TOKEN
       # thread_id: 42               # forum topic inside a supergroup
+      min_severity: major           # page only for major/critical (and unknown)
   smtp:
     - name: ops
       addr: smtp.example.com:587    # STARTTLS is used when the relay offers it
@@ -85,12 +98,15 @@ notify:
       to: ["On Call <oncall@example.com>"]
       username: statusrelay@example.com
       password_env: STATUSRELAY_SMTP_PASSWORD
+      # no route: mail gets everything, including source_blind
   webhook:
     - name: n8n
       url: https://hooks.example.com/statusrelay   # redirects are refused; give the final URL
       secret_env: STATUSRELAY_WEBHOOK_SECRET       # X-Statusrelay-Signature: sha256=<hmac of body>
       headers:
         Authorization: "Bearer replace-me"
+      kinds: [new, resolved, source_blind, source_recovered]
+      sources: [huawei-intl]
 
 # Seeing a delivery without waiting for a real incident:
 #   1. run with notify.log_only: true once; state_file is written and history

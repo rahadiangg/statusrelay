@@ -18,6 +18,13 @@ var (
 	// bot is not in, a recipient the relay refuses. Surfaced at once so the
 	// operator fixes the configuration instead of watching retries burn.
 	ErrPermanent = errors.New("notify: permanent delivery failure")
+
+	// ErrFiltered means the sink's route excluded the event: nothing was
+	// sent and nothing failed. It is neither transient nor permanent, so the
+	// retry decorator never sees it and the poller counts it as skipped
+	// rather than as a delivery — a filtered event that reported "ok" would
+	// make a mis-routed sink look healthy.
+	ErrFiltered = errors.New("notify: event filtered by route")
 )
 
 // RateLimited is a transient failure where the remote said how long to wait.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -68,6 +69,17 @@ func WithHTTPClient(d doer) Option { return func(s *Source) { s.client.http = d 
 // what to block.
 func WithUserAgent(ua string) Option { return func(s *Source) { s.userAgent = ua } }
 
+// pageURL returns the best public link for an event. The dashboard has no
+// per-incident route (only / and /history), so every event links to the
+// site root; the id is accepted for signature parity with the other adapters.
+func pageURL(base string) func(id string) string {
+	root := strings.TrimRight(base, "/")
+	if u, err := url.Parse(root); err == nil && u.Host != "" {
+		root = u.Scheme + "://" + u.Host
+	}
+	return func(string) string { return root + "/" }
+}
+
 // New builds a Source. id is the instance name, base is the dashboard URL.
 func New(id, base string, opts ...Option) (*Source, error) {
 	if strings.TrimSpace(base) == "" {
@@ -115,7 +127,7 @@ func (s *Source) Capabilities() incident.Capabilities {
 // follow only enrich or cross-check it, and each degrades on its own.
 func (s *Source) Fetch(ctx context.Context) (*incident.Snapshot, error) {
 	now := s.clock.Now()
-	m := &mapper{sourceID: s.id, now: now}
+	m := &mapper{sourceID: s.id, page: pageURL(s.client.base), now: now}
 
 	rows, truncated, err := s.client.historyEvents(ctx)
 	if err != nil {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log/slog"
 	"net"
 	"os"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/rahadiangg/statusrelay/internal/config"
 	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 	"github.com/rahadiangg/statusrelay/internal/platform/clock"
 )
 
@@ -40,7 +43,7 @@ notify:
   retry: {attempts: 2, backoff: 1s}
   telegram: [{name: tg, chat_id: "1", token_env: T}]
   smtp: [{name: mail, addr: "127.0.0.1:2525", from: a@example.com, to: [b@example.com], username: u, password_env: P}]
-  webhook: [{name: hook, url: "https://example.com/h", secret_env: S, headers: {Authorization: "Bearer x"}}]
+  webhook: [{name: hook, url: "https://example.com/h", secret_env: S, headers: {Authorization: "Bearer x"}, kinds: [resolved, source_blind]}]
 `), func(k string) string { return map[string]string{"T": "123:abc", "P": "pw", "S": "sec"}[k] })
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
@@ -95,7 +98,7 @@ func TestBuildSources(t *testing.T) {
 
 func TestBuildSinks(t *testing.T) {
 	cfg := fullConfig(t)
-	sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "statusrelay/test")
+	sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "statusrelay/test", nil)
 	if err != nil {
 		t.Fatalf("buildSinks: %v", err)
 	}
@@ -106,20 +109,26 @@ func TestBuildSinks(t *testing.T) {
 	if got := strings.Join(names, ","); got != "telegram/tg,smtp/mail,webhook/hook" {
 		t.Errorf("got %s", got)
 	}
+	// The webhook's route excludes "new": the built sink must refuse it with
+	// the sentinel before any network is touched (example.com is never hit).
+	ev := incident.Event{Kind: incident.KindNew, Record: incident.Record{Key: incident.Key{SourceID: "huawei-intl", ProviderID: "1"}}}
+	if err := sinks[2].Send(context.Background(), ev); !errors.Is(err, notify.ErrFiltered) {
+		t.Errorf("filtered kind: got err %v, want ErrFiltered", err)
+	}
 
 	cfg.Notify.LogOnly = true
-	if sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "x"); err != nil || sinks != nil {
+	if sinks, err := buildSinks(cfg, clock.NewFake(testEpoch), "x", nil); err != nil || sinks != nil {
 		t.Errorf("log_only: got %v, %v; want nil, nil", sinks, err)
 	}
 
 	cfg = fullConfig(t)
 	cfg.Notify.Webhook[0].URL = "ftp://nope"
-	if _, err := buildSinks(cfg, clock.NewFake(testEpoch), "x"); err == nil {
+	if _, err := buildSinks(cfg, clock.NewFake(testEpoch), "x", nil); err == nil {
 		t.Error("bad webhook url should fail sink construction")
 	}
 	cfg = fullConfig(t)
 	cfg.Notify.SMTP[0].Addr = "no-port"
-	if _, err := buildSinks(cfg, clock.NewFake(testEpoch), "x"); err == nil {
+	if _, err := buildSinks(cfg, clock.NewFake(testEpoch), "x", nil); err == nil {
 		t.Error("bad smtp addr should fail sink construction")
 	}
 }
@@ -188,7 +197,7 @@ func TestSourceIDsAndSinkNames(t *testing.T) {
 	if got := strings.Join(sourceIDs(cfg), ","); got != "huawei-intl,huawei-nomirror,alibaba-intl,tencent-intl" {
 		t.Errorf("sourceIDs: %s", got)
 	}
-	sinks, _ := buildSinks(cfg, clock.NewFake(testEpoch), "x")
+	sinks, _ := buildSinks(cfg, clock.NewFake(testEpoch), "x", nil)
 	if got := strings.Join(sinkNames(sinks), ","); got != "telegram/tg,smtp/mail,webhook/hook" {
 		t.Errorf("sinkNames: %s", got)
 	}

@@ -34,7 +34,7 @@ func decodeEvents(t *testing.T, name string) []wireEvent {
 }
 
 func newMapper() *mapper {
-	return &mapper{sourceID: "huawei-intl", preferLang: "en", levels: defaultLevels()}
+	return &mapper{sourceID: "huawei-intl", page: pageURL(DefaultBaseURL), preferLang: "en", levels: defaultLevels()}
 }
 
 // mapFixture decodes and maps a fixture, returning the records and anomalies.

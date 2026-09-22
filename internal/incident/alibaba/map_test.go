@@ -36,7 +36,7 @@ func decodeEvents(t *testing.T, name string) []wireEvent {
 	return ws
 }
 
-func newMapper() *mapper { return &mapper{sourceID: "alibaba-intl"} }
+func newMapper() *mapper { return &mapper{sourceID: "alibaba-intl", page: pageURL(DefaultBaseURL)} }
 
 func mapFixture(t *testing.T, name string, status incident.Status) ([]incident.Record, []incident.Warning) {
 	t.Helper()

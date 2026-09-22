@@ -96,24 +96,33 @@ func buildSources(cfg config.Config, clk clock.Clock, log *slog.Logger, ua strin
 // buildSinks constructs every configured transport, each wrapped in the
 // shared retry policy. A constructor failure (bad address, bad URL) is fatal
 // before the loop starts.
-func buildSinks(cfg config.Config, clk clock.Clock, ua string) ([]poller.Sink, error) {
+//
+// onRetry may be nil. Each transport is wrapped as filter(retry(transport)):
+// the route decides first, so a skipped event never costs a retry and the
+// retrier never sees the ErrFiltered sentinel.
+func buildSinks(cfg config.Config, clk clock.Clock, ua string, onRetry func(sink string)) ([]poller.Sink, error) {
 	if cfg.Notify.LogOnly {
 		return nil, nil
 	}
 	n := cfg.Notify
-	wrap := func(s notify.Notifier) poller.Sink {
-		return notify.WithRetry(s, clk, n.Retry.Attempts, n.Retry.Backoff)
+	rd := notify.Renderer{Loc: n.Location, Names: cfg.DisplayNames()}
+	wrap := func(s notify.Notifier, r config.Route) poller.Sink {
+		var ropts []notify.RetryOption
+		if onRetry != nil {
+			ropts = append(ropts, notify.OnRetry(onRetry))
+		}
+		return notify.WithFilter(notify.WithRetry(s, clk, n.Retry.Attempts, n.Retry.Backoff, ropts...), r.Filter())
 	}
 	var out []poller.Sink
 	for _, t := range n.Telegram {
-		s, err := telegram.New(t.Name, t.Token, t.ChatID, telegram.WithThreadID(t.ThreadID), telegram.WithUserAgent(ua))
+		s, err := telegram.New(t.Name, t.Token, t.ChatID, telegram.WithThreadID(t.ThreadID), telegram.WithUserAgent(ua), telegram.WithRenderer(rd))
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, wrap(s))
+		out = append(out, wrap(s, t.Route))
 	}
 	for _, m := range n.SMTP {
-		opts := []smtp.Option{smtp.WithClock(clk), smtp.WithUserAgent(ua)}
+		opts := []smtp.Option{smtp.WithClock(clk), smtp.WithUserAgent(ua), smtp.WithRenderer(rd)}
 		if m.Username != "" {
 			opts = append(opts, smtp.WithAuth(m.Username, m.Password))
 		}
@@ -121,10 +130,10 @@ func buildSinks(cfg config.Config, clk clock.Clock, ua string) ([]poller.Sink, e
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, wrap(s))
+		out = append(out, wrap(s, m.Route))
 	}
 	for _, w := range n.Webhook {
-		opts := []webhook.Option{webhook.WithHeaders(w.Headers), webhook.WithUserAgent(ua), webhook.WithTimeout(cfg.FetchTimeout)}
+		opts := []webhook.Option{webhook.WithHeaders(w.Headers), webhook.WithUserAgent(ua), webhook.WithTimeout(cfg.FetchTimeout), webhook.WithRenderer(rd)}
 		if w.Secret != "" {
 			opts = append(opts, webhook.WithSecret(w.Secret))
 		}
@@ -132,7 +141,7 @@ func buildSinks(cfg config.Config, clk clock.Clock, ua string) ([]poller.Sink, e
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, wrap(s))
+		out = append(out, wrap(s, w.Route))
 	}
 	return out, nil
 }

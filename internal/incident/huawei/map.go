@@ -17,6 +17,7 @@ import (
 // one.
 type mapper struct {
 	sourceID   string
+	page       func(id string) string
 	preferLang string
 	levels     map[int64]incident.Severity
 	anomalies  []incident.Warning
@@ -120,6 +121,7 @@ func (m *mapper) mapEvent(w *wireEvent, status incident.Status) incident.Record 
 
 	r := incident.Record{
 		Key:         incident.Key{SourceID: m.sourceID, ProviderID: id},
+		URL:         m.page(id),
 		Title:       title,
 		TitleLang:   lang,
 		Titles:      titles,

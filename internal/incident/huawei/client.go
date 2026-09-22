@@ -104,6 +104,13 @@ func (c *client) rememberHost(idx int) {
 	c.usedAlt = idx != 0
 }
 
+// usingMirror reports whether the last successful request went to the mirror.
+func (c *client) usingMirror() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.usedAlt
+}
+
 func (c *client) currentEvents(ctx context.Context) ([]wireEvent, httpx.Result, error) {
 	var ws []wireEvent
 	// No query parameters at all. In particular never region_code: this API

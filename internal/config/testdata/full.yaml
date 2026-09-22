@@ -19,6 +19,7 @@ sources:
     min_severity: major
     prefer_lang: zh
     allow_non_intl: false
+    display_name: Huawei Cloud (intl)
   - id: huawei-all
     kind: huawei
     all_regions: true
@@ -34,8 +35,9 @@ sources:
 
 notify:
   retry: {attempts: 5, backoff: 1s}
+  timezone: Asia/Jakarta
   telegram:
-    - {name: oncall, chat_id: "-100123", token_env: TG_TOKEN, thread_id: 42}
+    - {name: oncall, chat_id: "-100123", token_env: TG_TOKEN, thread_id: 42, min_severity: major}
   smtp:
     - name: ops
       addr: smtp.example.com:587
@@ -43,6 +45,8 @@ notify:
       to: [a@example.com, b@example.com]
       username: bot
       password_env: SMTP_PW
+      kinds: [new, resolved, source_blind]
+      sources: [huawei-intl, alibaba-intl]
   webhook:
     - name: n8n
       url: https://hooks.example.com/x

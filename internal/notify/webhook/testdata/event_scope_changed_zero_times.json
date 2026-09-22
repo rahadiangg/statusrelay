@@ -21,6 +21,7 @@
     "ap-southeast-5/ECS"
   ],
   "removed": [],
-  "subject": "[statusrelay] SCOPE CHANGED unknown (level 7): Abnormal accounts in AP-Jakarta",
-  "text": "SCOPE CHANGED · unknown (level 7) · huawei-intl #13\nAbnormal accounts in AP-Jakarta\nStatus: open\nRegions: global (no region published)\nNow affecting: ap-southeast-5/ECS\n\nFirst run: this may have started before statusrelay did.\n"
+  "url": "",
+  "subject": "[statusrelay] SCOPE CHANGED unknown (level 7) · huawei-intl · global",
+  "text": "SCOPE CHANGED · unknown (level 7) · huawei-intl #13\nAbnormal accounts in AP-Jakarta\nStatus: open\nAll regions: global (no region published)\nNow affecting: ap-southeast-5/ECS\n\nFirst run: this may have started before statusrelay did.\n"
 }

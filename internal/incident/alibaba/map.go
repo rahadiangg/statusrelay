@@ -28,6 +28,7 @@ var severities = map[string]incident.Severity{
 // incident.
 type mapper struct {
 	sourceID  string
+	page      func(id string) string
 	anomalies []incident.Warning
 }
 
@@ -115,6 +116,7 @@ func (m *mapper) mapEvent(w *wireEvent, status incident.Status) incident.Record 
 
 	r := incident.Record{
 		Key:         incident.Key{SourceID: m.sourceID, ProviderID: id},
+		URL:         m.page(id),
 		Title:       title,
 		TitleLang:   lang,
 		Titles:      titles,

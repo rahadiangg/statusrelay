@@ -42,6 +42,7 @@ type Notifier struct {
 	clock    clock.Clock
 	sendMail SendMailFunc
 	ua       string
+	render   notify.Renderer
 }
 
 // Option configures a Notifier.
@@ -64,6 +65,10 @@ func WithSendMail(f SendMailFunc) Option { return func(n *Notifier) { n.sendMail
 
 // WithUserAgent sets the X-Mailer header.
 func WithUserAgent(ua string) Option { return func(n *Notifier) { n.ua = ua } }
+
+// WithRenderer sets how events are turned into text (timezone, provider
+// names). The zero Renderer is UTC with raw source ids.
+func WithRenderer(r notify.Renderer) Option { return func(n *Notifier) { n.render = r } }
 
 // New builds a Notifier. addr is host:port; from and to are RFC 5322
 // addresses, display names allowed.
@@ -132,7 +137,7 @@ func (n *Notifier) Send(ctx context.Context, ev incident.Event) error {
 
 // build renders the RFC 5322 message with CRLF line endings.
 func (n *Notifier) build(ev incident.Event) ([]byte, error) {
-	m := notify.Render(ev)
+	m := n.render.Render(ev)
 
 	tos := make([]string, len(n.to))
 	for i, a := range n.to {

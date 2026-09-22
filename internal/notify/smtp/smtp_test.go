@@ -139,8 +139,10 @@ func testEvent(kind incident.EventKind) incident.Event {
 		Severity:  incident.SeverityMajor,
 		Status:    incident.StatusOpen,
 		StartedAt: time.Date(2026, 7, 25, 19, 5, 0, 0, time.UTC),
-		Scope:     []incident.Scope{{RegionCode: "ap-southeast-4", RegionName: "AP-Jakarta", Services: []incident.Service{{Abbr: "ECS"}}}},
-		Updates:   []incident.Update{{At: time.Date(2026, 7, 25, 19, 5, 0, 0, time.UTC), Text: strings.Repeat("尊敬的华为云客户，", 40)}},
+		// A CJK region name reaches the Subject, which is what proves the
+		// header is Q-encoded rather than sent raw.
+		Scope:   []incident.Scope{{RegionCode: "ap-southeast-4", RegionName: "亚太-雅加达", Services: []incident.Service{{Abbr: "ECS"}}}},
+		Updates: []incident.Update{{At: time.Date(2026, 7, 25, 19, 5, 0, 0, time.UTC), Text: strings.Repeat("尊敬的华为云客户，", 40)}},
 	}
 	r.FP = incident.Compute(r)
 	return incident.Event{Kind: kind, Record: r, NewUpdates: r.Updates}
@@ -214,7 +216,7 @@ func TestSendDeliversWellFormedMessage(t *testing.T) {
 	for _, tc := range []struct{ name, got, want string }{
 		{"From", h.Get("From"), `"StatusRelay" <bot@example.com>`},
 		{"To", h.Get("To"), `"On Call" <oncall@example.com>, <sre@example.com>`},
-		{"Subject", subject, "[statusrelay] NEW major: 亚太-雅加达 ECS anomaly: <b>不是</b> markup"},
+		{"Subject", subject, "[statusrelay] NEW major · huawei-intl · 亚太-雅加达 (ECS)"},
 		{"Date", h.Get("Date"), "Mon, 21 Sep 2026 10:30:00 +0000"},
 		{"Message-ID", h.Get("Message-ID"), "<" + notify.ThreadID(ev.Record.Key) + "@statusrelay>"},
 		{"Content-Type", h.Get("Content-Type"), "text/plain; charset=utf-8"},

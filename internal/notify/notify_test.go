@@ -65,6 +65,8 @@ func TestWithRetry(t *testing.T) {
 		wantWaits []time.Duration
 		wantErr   error // sentinel expected in the result, nil for success
 	}{
+		// wantCalls-1 retries are reported through OnRetry for every row,
+		// except a permanent failure or a single attempt, which retry nothing.
 		{name: "first try succeeds", attempts: 3, base: time.Second, wantCalls: 1},
 		{name: "transient then success", script: []error{transient}, attempts: 3, base: time.Second,
 			wantCalls: 2, wantWaits: []time.Duration{time.Second}},
@@ -86,12 +88,21 @@ func TestWithRetry(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			f := scripted(tc.script...)
 			clk := &instantClock{}
-			n := WithRetry(f, clk, tc.attempts, tc.base)
+			var retried []string
+			n := WithRetry(f, clk, tc.attempts, tc.base, OnRetry(func(sink string) { retried = append(retried, sink) }))
 
 			err := n.Send(context.Background(), event13())
 
 			if got := len(f.Calls()); got != tc.wantCalls {
 				t.Errorf("got %d calls, want %d", got, tc.wantCalls)
+			}
+			if got := len(retried); got != tc.wantCalls-1 {
+				t.Errorf("OnRetry fired %d times, want %d (one per retry)", got, tc.wantCalls-1)
+			}
+			for _, name := range retried {
+				if name != "fake/x" {
+					t.Errorf("OnRetry got sink %q, want fake/x", name)
+				}
 			}
 			if fmt.Sprint(clk.waits) != fmt.Sprint(tc.wantWaits) {
 				t.Errorf("got waits %v, want %v", clk.waits, tc.wantWaits)

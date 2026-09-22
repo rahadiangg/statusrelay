@@ -324,6 +324,17 @@ func (p *Poller) counts(recs map[incident.Key]incident.Stored, st *sourceState) 
 			out.Open++
 		case incident.StatusUnknown:
 			out.Unknown++
+		default:
+			continue
+		}
+		// Publication time when the provider gave one, else when we first
+		// saw it: a record with no timestamp is still an open incident.
+		since := r.Record.StartedAt
+		if since.IsZero() {
+			since = r.FirstSeenAt
+		}
+		if !since.IsZero() && (out.OldestOpen.IsZero() || since.Before(out.OldestOpen)) {
+			out.OldestOpen = since
 		}
 	}
 	return out
@@ -364,16 +375,34 @@ func (p *Poller) fanOut(ctx context.Context, ev incident.Event) {
 	}
 	// ponytail: sequential fan-out; a WaitGroup if a slow SMTP relay ever
 	// delays Telegram noticeably.
+	var ok, failed int
 	for _, sk := range p.sinks {
 		sctx, cancel := context.WithTimeout(ctx, p.o.FetchTimeout)
+		start := p.o.Clock.Now()
 		err := sk.Send(sctx, ev)
 		cancel()
-		p.o.Observer.Delivered(sk.Name(), err)
-		if err != nil {
+		p.o.Observer.Delivered(sk.Name(), p.o.Clock.Now().Sub(start), err)
+		switch {
+		case errors.Is(err, notify.ErrFiltered):
+			log.Debug("skipped by route", "sink", sk.Name())
+		case err != nil:
+			failed++
 			log.Error("delivery failed", "sink", sk.Name(), "err", err)
-			continue
+		default:
+			ok++
+			log.Info("delivered", "sink", sk.Name())
 		}
-		log.Info("delivered", "sink", sk.Name())
+	}
+	// An event that reached nobody is the failure mode a pager exists to
+	// prevent, so it gets its own signal rather than being inferred from
+	// per-sink counters.
+	if ok == 0 {
+		reason := "unrouted"
+		if failed > 0 {
+			reason = "error"
+		}
+		p.o.Observer.Undelivered(ev.Record.Key.SourceID, reason)
+		log.Warn("event reached no sink", "reason", reason, "title", ev.Record.Title)
 	}
 }
 

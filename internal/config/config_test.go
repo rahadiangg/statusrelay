@@ -70,6 +70,16 @@ func TestParseFull(t *testing.T) {
 		{"smtp password resolved", cfg.Notify.SMTP[0].Password, "hunter2"},
 		{"webhook secret resolved", cfg.Notify.Webhook[0].Secret, "s3cret"},
 		{"webhook headers", cfg.Notify.Webhook[0].Headers, map[string]string{"Authorization": "Bearer abc"}},
+		{"timezone resolved", cfg.Notify.Location.String(), "Asia/Jakarta"},
+		{"display_name explicit", cfg.Sources[0].DisplayName, "Huawei Cloud (intl)"},
+		{"display_name default by kind", cfg.Sources[2].DisplayName, "Alibaba Cloud"},
+		{"display names map", cfg.DisplayNames()["tencent-intl"], "Tencent Cloud"},
+		{"telegram route severity", cfg.Notify.Telegram[0].Severity, incident.SeverityMajor},
+		{"telegram route string", cfg.Notify.Telegram[0].String(), "severity >= major"},
+		{"smtp route kinds", cfg.Notify.SMTP[0].Kinds, []string{"new", "resolved", "source_blind"}},
+		{"smtp route sources", cfg.Notify.SMTP[0].Sources, []string{"huawei-intl", "alibaba-intl"}},
+		{"webhook route is open", cfg.Notify.Webhook[0].String(), "all events"},
+		{"webhook filter empty", cfg.Notify.Webhook[0].Filter().Empty(), true},
 	} {
 		if !reflect.DeepEqual(tc.got, tc.want) {
 			t.Errorf("%s: got %#v, want %#v", tc.name, tc.got, tc.want)
@@ -186,6 +196,16 @@ func TestParseRejects(t *testing.T) {
 		{name: "http.listen without port", yaml: "http: {listen: localhost}\n" + validSource + "notify: {log_only: true}", want: "http.listen"},
 		{name: "http.listen garbage", yaml: "http: {listen: 'a:b:c'}\n" + validSource + "notify: {log_only: true}", want: "http.listen"},
 		{name: "env poll override unparsable", yaml: validSource + "notify: {log_only: true}", env: map[string]string{EnvPollInterval: "soon"}, want: EnvPollInterval},
+		{name: "bad timezone", yaml: validSource + "notify: {log_only: true, timezone: Mars/Olympus}", want: "notify.timezone"},
+		{name: "route bad severity", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', min_severity: loud}]}", want: "min_severity \"loud\""},
+		{name: "route severity unknown is not a floor", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', min_severity: unknown}]}", want: "min_severity"},
+		{name: "route unknown kind", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', kinds: [new, teleported]}]}", want: `"teleported" is not one of`},
+		{name: "route upper-case kind", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', kinds: [NEW]}]}", want: `"NEW" is not one of`},
+		{name: "route empty kinds", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', kinds: []}]}", want: "kinds is empty"},
+		{name: "route empty sources", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', sources: []}]}", want: "sources is empty"},
+		{name: "route unknown source", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', sources: [aws-global]}]}", want: `"aws-global" is not a configured source id`},
+		{name: "nobody receives source_blind", yaml: validSource + "notify: {webhook: [{name: a, url: 'https://x', kinds: [new, resolved]}]}", want: "no sink would receive a source_blind"},
+		{name: "source_blind covered only for another source", yaml: "sources:\n  - {id: a, kind: huawei, all_regions: true}\n  - {id: b, kind: huawei, all_regions: true}\nnotify: {webhook: [{name: w, url: 'https://x', sources: [a]}]}", want: "source_blind event for b"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			_, err := Parse(strings.NewReader(tc.yaml), env(tc.env))

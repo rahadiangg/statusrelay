@@ -19,8 +19,14 @@ type Observer interface {
 	SnapshotSeen(source string, snap *incident.Snapshot)
 	// EventsEmitted carries the diff result, possibly empty.
 	EventsEmitted(source string, evs []incident.Event)
-	// Delivered is called once per sink per event.
-	Delivered(sink string, err error)
+	// Delivered is called once per sink per event. d is the wall time of the
+	// whole attempt including retries; err is nil on success,
+	// notify.ErrFiltered when the sink's route skipped the event.
+	Delivered(sink string, d time.Duration, err error)
+	// Undelivered is called once per event that no sink accepted: reason is
+	// "unrouted" when every sink skipped it, "error" when at least one tried
+	// and all failed. Never called when no sinks are configured.
+	Undelivered(source, reason string)
 	// StateApplied follows Apply with this source's counts as of this poll.
 	StateApplied(source string, st State)
 	SelfChecked(source string, err error)
@@ -36,6 +42,11 @@ type State struct {
 	Blind   bool
 	// LastComplete is zero until the first complete snapshot.
 	LastComplete time.Time
+	// OldestOpen is the publication time of the longest-running matched
+	// record still open or unknown; zero when there is none. A timestamp
+	// rather than an age so it stays truthful while StateApplied is not
+	// being called (fetch failures).
+	OldestOpen time.Time
 }
 
 // Nop is the default Observer.
@@ -44,7 +55,8 @@ type Nop struct{}
 func (Nop) PollDone(string, time.Duration, int, error) {}
 func (Nop) SnapshotSeen(string, *incident.Snapshot)    {}
 func (Nop) EventsEmitted(string, []incident.Event)     {}
-func (Nop) Delivered(string, error)                    {}
+func (Nop) Delivered(string, time.Duration, error)     {}
+func (Nop) Undelivered(string, string)                 {}
 func (Nop) StateApplied(string, State)                 {}
 func (Nop) SelfChecked(string, error)                  {}
 func (Nop) Saved(error)                                {}

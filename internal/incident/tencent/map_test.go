@@ -40,7 +40,9 @@ func decodeHistory(t *testing.T, name string) []wireEvent {
 	return h.List
 }
 
-func newMapper() *mapper { return &mapper{sourceID: "tencent-intl", now: testEpoch} }
+func newMapper() *mapper {
+	return &mapper{sourceID: "tencent-intl", page: pageURL(DefaultBaseURL), now: testEpoch}
+}
 
 func mapFixture(t *testing.T, name string) (open, resolved []incident.Record, m *mapper) {
 	t.Helper()

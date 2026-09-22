@@ -33,6 +33,7 @@ func event13() incident.Event {
 	}
 	r := incident.Record{
 		Key:         incident.Key{SourceID: "huawei-intl", ProviderID: "13"},
+		URL:         "https://status.service.huaweicloud.com/intl/",
 		Title:       "Notification of Abnormal Huawei Cloud Accounts in AP-Manila, CN-Hong Kong, AP-Jakarta, LA-Sao Paulo1 and TR-Istanbul Regions on Jul 26, 2026 GMT+8:00",
 		TitleLang:   "en",
 		Severity:    incident.SeverityMajor,
@@ -51,5 +52,6 @@ func event13() incident.Event {
 		}},
 	}
 	r.FP = incident.Compute(r)
-	return incident.Event{Kind: incident.KindNew, Record: r, NewUpdates: r.Updates}
+	// Watched is what Diff attaches for a deployment watching only Jakarta.
+	return incident.Event{Kind: incident.KindNew, Record: r, NewUpdates: r.Updates, Watched: r.Scope[:1]}
 }

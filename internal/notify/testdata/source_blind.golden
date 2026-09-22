@@ -1,10 +1,9 @@
-Subject: [statusrelay] SOURCE BLIND critical: statusrelay cannot see huawei-intl (no complete snapshot for 16m0s)
+Subject: [statusrelay] SOURCE BLIND critical · huawei-intl
 
-SOURCE BLIND · critical · huawei-intl #statusrelay
+SOURCE BLIND · critical · huawei-intl
 statusrelay cannot see huawei-intl (no complete snapshot for 16m0s)
 Status: open
 Published: 2026-09-21 10:14 UTC
-Regions: global (no region published)
 
 Update 2026-09-21 10:30 UTC:
   fetching open incidents: incident: upstream request failed: dial tcp: i/o timeout

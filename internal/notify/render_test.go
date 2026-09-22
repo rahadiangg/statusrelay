@@ -16,11 +16,29 @@ var update = flag.Bool("update", false, "rewrite golden files")
 func TestRenderGolden(t *testing.T) {
 	base := event13()
 
+	jakarta, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		t.Fatal(err)
+	}
+	named := Renderer{Loc: jakarta, Names: map[string]string{"huawei-intl": "Huawei Cloud"}}
+
 	for _, tc := range []struct {
 		name string
+		rd   Renderer
 		ev   func() incident.Event
 	}{
 		{name: "new", ev: func() incident.Event { return base }},
+		{name: "new_named_local_time", rd: named, ev: func() incident.Event { return base }},
+		{name: "many_watched_regions", rd: named, ev: func() incident.Event {
+			ev := base
+			ev.Record.Scope = nil
+			for _, c := range []string{"ap-southeast-4", "ap-southeast-3", "ap-southeast-2", "cn-hongkong", "tr-west-1"} {
+				ev.Record.Scope = append(ev.Record.Scope, incident.Scope{RegionCode: c, RegionName: c})
+			}
+			ev.Watched = ev.Record.Scope // watching everything: no separate Watched line, capped subject
+			ev.NewUpdates = nil
+			return ev
+		}},
 		{name: "updated", ev: func() incident.Event {
 			ev := base
 			ev.Kind = incident.KindUpdated
@@ -59,6 +77,7 @@ func TestRenderGolden(t *testing.T) {
 			ev.ColdStart = true
 			ev.Record.Global = true
 			ev.Record.Scope = nil
+			ev.Watched = []incident.Scope{}
 			ev.Record.Severity = incident.SeverityUnknown
 			ev.Record.RawSeverity = "7"
 			ev.Record.StartedAt = time.Time{}
@@ -70,11 +89,12 @@ func TestRenderGolden(t *testing.T) {
 			ev.Kind = incident.KindMinorUpdated
 			ev.NewUpdates = nil
 			ev.Record.Scope = []incident.Scope{{RegionCode: "tr-west-1"}}
+			ev.Watched = nil // built without a filter: falls back to the full scope
 			return ev
 		}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			m := Render(tc.ev())
+			m := tc.rd.Render(tc.ev())
 			got := "Subject: " + m.Subject + "\n\n" + m.Body
 			path := filepath.Join("testdata", tc.name+".golden")
 			if *update {
@@ -90,15 +110,20 @@ func TestRenderGolden(t *testing.T) {
 	}
 }
 
+// Provider-controlled text reaches the subject through region names; a line
+// break there would inject mail headers.
 func TestRenderSubjectIsOneLine(t *testing.T) {
 	ev := event13()
-	ev.Record.Title = "Line one\r\nBcc: attacker@example.com\nline three"
+	ev.Watched[0].RegionName = "Line one\r\nBcc: attacker@example.com\nline three"
 	m := Render(ev)
 	if strings.ContainsAny(m.Subject, "\r\n") {
 		t.Errorf("subject contains line breaks: %q", m.Subject)
 	}
 	if !strings.Contains(m.Subject, "Line one Bcc: attacker@example.com line three") {
 		t.Errorf("subject lost text: got %q", m.Subject)
+	}
+	if strings.Contains(m.Subject, ev.Record.Title[:20]) {
+		t.Errorf("subject still carries the provider title: %q", m.Subject)
 	}
 }
 

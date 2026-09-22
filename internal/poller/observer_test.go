@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 // recObserver records every hook call as one line.
@@ -28,12 +29,18 @@ func (r *recObserver) SnapshotSeen(src string, s *incident.Snapshot) {
 func (r *recObserver) EventsEmitted(src string, evs []incident.Event) {
 	r.add(fmt.Sprintf("events:%s:%s", src, kinds(evs)))
 }
-func (r *recObserver) Delivered(sink string, err error) {
-	r.add(fmt.Sprintf("deliver:%s:%v", sink, err != nil))
+func (r *recObserver) Delivered(sink string, _ time.Duration, err error) {
+	switch {
+	case errors.Is(err, notify.ErrFiltered):
+		r.add("deliver:" + sink + ":skipped")
+	default:
+		r.add(fmt.Sprintf("deliver:%s:%v", sink, err != nil))
+	}
 }
+func (r *recObserver) Undelivered(src, reason string) { r.add("undelivered:" + src + ":" + reason) }
 func (r *recObserver) StateApplied(src string, s State) {
-	r.add(fmt.Sprintf("state:%s:open=%d:unknown=%d:resolved=%d:blind=%v:complete=%v",
-		src, s.Open, s.Unknown, s.Records[incident.StatusResolved], s.Blind, !s.LastComplete.IsZero()))
+	r.add(fmt.Sprintf("state:%s:open=%d:unknown=%d:resolved=%d:blind=%v:complete=%v:oldest=%v",
+		src, s.Open, s.Unknown, s.Records[incident.StatusResolved], s.Blind, !s.LastComplete.IsZero(), !s.OldestOpen.IsZero()))
 }
 func (r *recObserver) SelfChecked(src string, err error) {
 	r.add(fmt.Sprintf("selfcheck:%s:%v", src, err != nil))
@@ -58,12 +65,65 @@ func TestObserverSequence(t *testing.T) {
 		"events:src:new",
 		"deliver:fake/a:false",
 		"deliver:fake/b:true",
-		"state:src:open=1:unknown=0:resolved=0:blind=false:complete=true",
+		"state:src:open=1:unknown=0:resolved=0:blind=false:complete=true:oldest=true",
 		"saved:false",
 		"poll:src:0s:fail=1:true",
 	}, "\n")
 	if got := strings.Join(obs.calls, "\n"); got != want {
 		t.Errorf("observer sequence:\n--- got ---\n%s\n--- want ---\n%s", got, want)
+	}
+}
+
+// A route that skips an event is reported as skipped, never as ok, and an
+// event no sink accepts is reported once with why.
+func TestObserverReportsSkippedAndUndelivered(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		a, b     error
+		wantTail string
+	}{
+		{"both skip", notify.ErrFiltered, notify.ErrFiltered,
+			"deliver:fake/a:skipped\ndeliver:fake/b:skipped\nundelivered:src:unrouted"},
+		{"one skips one fails", notify.ErrFiltered, errors.New("down"),
+			"deliver:fake/a:skipped\ndeliver:fake/b:true\nundelivered:src:error"},
+		{"one skips one delivers", notify.ErrFiltered, nil,
+			"deliver:fake/a:skipped\ndeliver:fake/b:false"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			h := newHarness()
+			obs := &recObserver{}
+			h.opts.Observer = obs
+			h.sinkA.SendFunc = func(context.Context, incident.Event) error { return tc.a }
+			h.sinkB.SendFunc = func(context.Context, incident.Event) error { return tc.b }
+			src := scripted("src", snap("src", []incident.Record{record("src", "13", "jkt")}, nil))
+			p := h.started(t, src)
+			p.pollAll(context.Background())
+
+			joined := strings.Join(obs.calls, "\n")
+			if !strings.Contains(joined, tc.wantTail) {
+				t.Errorf("observer calls:\n%s\n--- want to contain ---\n%s", joined, tc.wantTail)
+			}
+			if strings.Contains(joined, "undelivered") != strings.Contains(tc.wantTail, "undelivered") {
+				t.Errorf("undelivered reported wrongly:\n%s", joined)
+			}
+		})
+	}
+}
+
+// With no sinks at all, events are logged and never counted as undelivered:
+// log_only is a choice, not a failure.
+func TestNoSinksIsNotUndelivered(t *testing.T) {
+	h := newHarness()
+	obs := &recObserver{}
+	h.opts.Observer = obs
+	src := scripted("src", snap("src", []incident.Record{record("src", "13", "jkt")}, nil))
+	p := New([]incident.Source{src}, nil, h.store, h.opts)
+	if err := p.start(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	p.pollAll(context.Background())
+	if joined := strings.Join(obs.calls, "\n"); strings.Contains(joined, "undelivered") || strings.Contains(joined, "deliver:") {
+		t.Errorf("delivery hooks fired with no sinks:\n%s", joined)
 	}
 }
 

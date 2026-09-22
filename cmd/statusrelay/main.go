@@ -10,6 +10,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	// notify.timezone must resolve on Windows and in a scratch image, neither
+	// of which has an OS zoneinfo database.
+	_ "time/tzdata"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -61,7 +64,11 @@ func run(args []string) int {
 		log.Error("building sources", "err", err)
 		return 2
 	}
-	sinks, err := buildSinks(cfg, clk, ua)
+	// The recorder exists before the sinks because retries happen inside a
+	// sink, below the poller's view; the retry hook is the only way out.
+	reg := prometheus.NewRegistry()
+	rec := metrics.New(reg, version, commit)
+	sinks, err := buildSinks(cfg, clk, ua, rec.Retried)
 	if err != nil {
 		log.Error("building notifiers", "err", err)
 		return 2
@@ -73,8 +80,6 @@ func run(args []string) int {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	reg := prometheus.NewRegistry()
-	rec := metrics.New(reg, version, commit)
 	rec.Init(sourceIDs(cfg), sinkNames(sinks))
 	opts := pollerOptions(cfg, clk, log)
 	opts.Observer = rec

@@ -20,6 +20,18 @@ import (
 // regions, and nothing downstream can tell the difference.
 const DefaultBaseURL = "https://status.service.huaweicloud.com/intl"
 
+// pageURL returns the best public link for an event. The dashboard is a
+// hash-routed SPA whose only per-id route (event-reporting/:id) renders the
+// summary page, not the incident — verified in a browser — so every event
+// links to the dashboard root. It is built on the configured base, not on
+// whichever host served the fetch: a deliberate mainland base links to the
+// mainland site. The id is accepted for signature parity with the other
+// adapters.
+func pageURL(base string) func(id string) string {
+	root := strings.TrimRight(base, "/") + "/"
+	return func(string) string { return root }
+}
+
 // DefaultMirrorURL serves byte-identical data from a different edge, which is
 // what makes it useful when the primary is blocked rather than broken.
 const DefaultMirrorURL = "https://status.service.huaweicloud.cn/intl"
@@ -116,7 +128,7 @@ func New(id, base string, opts ...Option) (*Source, error) {
 		s.client.http = httpx.New(hopts...)
 	}
 	s.mapper = func() *mapper {
-		return &mapper{sourceID: s.id, preferLang: s.preferLang, levels: s.levels}
+		return &mapper{sourceID: s.id, page: pageURL(base), preferLang: s.preferLang, levels: s.levels}
 	}
 	return s, nil
 }
@@ -216,6 +228,8 @@ func (s *Source) Fetch(ctx context.Context) (*incident.Snapshot, error) {
 	}
 
 	snap.Warnings = append(snap.Warnings, m.anomalies...)
+	// Read after the fetches, so it reflects the host that served this poll.
+	snap.Mirror = s.client.usingMirror()
 	return snap, nil
 }
 

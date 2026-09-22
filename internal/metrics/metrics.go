@@ -13,6 +13,7 @@
 package metrics
 
 import (
+	"errors"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,13 +26,17 @@ import (
 
 const ns = "statusrelay"
 
-// EventKinds is every kind the poller can emit, for pre-initialisation.
-var EventKinds = []incident.EventKind{
-	incident.KindNew, incident.KindUpdated, incident.KindScopeChanged, incident.KindMinorUpdated,
-	incident.KindResolved, incident.KindResolvedInferred, incident.KindReopened,
-	incident.KindMissedAndResolved, incident.KindUpdatedAfterResolve, incident.KindVanished,
-	incident.KindScopeExited, notify.KindSourceBlind, notify.KindSourceRecovered,
+// EventKinds is every kind the poller can emit, for pre-initialisation. It
+// is the same closed set config validates sink routes against.
+var EventKinds = notify.EventKinds
+
+var severities = []incident.Severity{
+	incident.SeverityUnknown, incident.SeverityInfo, incident.SeverityMinor,
+	incident.SeverityMajor, incident.SeverityCritical,
 }
+
+var deliveryResults = []string{"ok", "error", "skipped"}
+var undeliveredReasons = []string{"unrouted", "error"}
 
 // AnomalyKinds mirrors the closed set in the contract package.
 var AnomalyKinds = []string{
@@ -51,7 +56,11 @@ type Recorder struct {
 	incomplete   *prometheus.CounterVec
 	anomalies    *prometheus.CounterVec
 	events       *prometheus.CounterVec
+	undelivered  *prometheus.CounterVec
 	deliveries   *prometheus.CounterVec
+	deliveryDur  *prometheus.HistogramVec
+	retries      *prometheus.CounterVec
+	lastSuccess  *prometheus.GaugeVec
 	selfChecks   *prometheus.CounterVec
 	saveFailures prometheus.Counter
 
@@ -63,6 +72,8 @@ type Recorder struct {
 	lastPoll     *prometheus.GaugeVec
 	failures     *prometheus.GaugeVec
 	unresolved   *prometheus.GaugeVec
+	mirror       *prometheus.GaugeVec
+	oldestOpen   *prometheus.GaugeVec
 
 	now func() time.Time
 }
@@ -82,9 +93,18 @@ func New(reg *prometheus.Registry, version, commit string) *Recorder {
 		anomalies: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "snapshot_anomalies_total",
 			Help: "Non-fatal oddities in upstream data, by kind."}, []string{"source", "kind"}),
 		events: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "events_total",
-			Help: "Transitions emitted to sinks, by kind. Includes source_blind/source_recovered."}, []string{"source", "kind"}),
+			Help: "Transitions emitted to sinks, by kind and severity. Includes source_blind/source_recovered."}, []string{"source", "kind", "severity"}),
+		undelivered: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "events_undelivered_total",
+			Help: "Events no sink accepted: unrouted when every sink's route skipped it, error when every attempt failed. Nobody was paged."}, []string{"source", "reason"}),
 		deliveries: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "deliveries_total",
-			Help: "Per-sink delivery attempts after retries, by result."}, []string{"sink", "result"}),
+			Help: "Per-sink delivery outcomes after retries: ok, error, or skipped by the sink's route."}, []string{"sink", "result"}),
+		deliveryDur: prometheus.NewHistogramVec(prometheus.HistogramOpts{Namespace: ns, Name: "delivery_duration_seconds",
+			Help:    "Wall time of one delivery including retries and backoff; skipped events are not observed.",
+			Buckets: []float64{.1, .25, .5, 1, 2.5, 5, 10, 30}}, []string{"sink"}),
+		retries: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "delivery_retries_total",
+			Help: "Retried delivery attempts. A sink that reports ok but retries every time is a flapping relay."}, []string{"sink"}),
+		lastSuccess: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "last_delivery_success_timestamp_seconds",
+			Help: "Unix time of the last successful delivery per sink; 0 until the first. The only way to notice a dead sink before an incident."}, []string{"sink"}),
 		selfChecks: prometheus.NewCounterVec(prometheus.CounterOpts{Namespace: ns, Name: "self_checks_total",
 			Help: "Source integrity probes, by result. A failing probe marks every later snapshot incomplete."}, []string{"source", "result"}),
 		saveFailures: prometheus.NewCounter(prometheus.CounterOpts{Namespace: ns, Name: "state_save_failures_total",
@@ -106,6 +126,10 @@ func New(reg *prometheus.Registry, version, commit string) *Recorder {
 			Help: "Fetch failures since the last success."}, []string{"source"}),
 		unresolved: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "provider_unresolved_count",
 			Help: "The provider's own unresolved count from its statistics endpoint; a cross-check against incidents_open. Absent when the provider did not report one."}, []string{"source"}),
+		mirror: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "source_using_mirror",
+			Help: "1 when the last snapshot came from the adapter's fallback host. Always 0 for adapters without a mirror."}, []string{"source"}),
+		oldestOpen: prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "oldest_open_incident_started_timestamp_seconds",
+			Help: "Publication time of the longest-running matched incident still open or unknown; 0 when none. Age = time() - this."}, []string{"source"}),
 		now: time.Now,
 	}
 	build := prometheus.NewGaugeVec(prometheus.GaugeOpts{Namespace: ns, Name: "build_info",
@@ -116,8 +140,10 @@ func New(reg *prometheus.Registry, version, commit string) *Recorder {
 		collectors.NewGoCollector(),
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		build,
-		r.polls, r.pollDuration, r.incomplete, r.anomalies, r.events, r.deliveries, r.selfChecks, r.saveFailures,
+		r.polls, r.pollDuration, r.incomplete, r.anomalies, r.events, r.undelivered,
+		r.deliveries, r.deliveryDur, r.retries, r.lastSuccess, r.selfChecks, r.saveFailures,
 		r.open, r.unknown, r.records, r.blind, r.lastComplete, r.lastPoll, r.failures, r.unresolved,
+		r.mirror, r.oldestOpen,
 	)
 	return r
 }
@@ -135,7 +161,12 @@ func (r *Recorder) Init(sources, sinks []string) {
 			r.anomalies.WithLabelValues(s, k)
 		}
 		for _, k := range EventKinds {
-			r.events.WithLabelValues(s, string(k))
+			for _, sev := range severities {
+				r.events.WithLabelValues(s, string(k), sev.String())
+			}
+		}
+		for _, reason := range undeliveredReasons {
+			r.undelivered.WithLabelValues(s, reason)
 		}
 		for _, st := range statuses {
 			r.records.WithLabelValues(s, st.String())
@@ -146,18 +177,28 @@ func (r *Recorder) Init(sources, sinks []string) {
 		r.lastComplete.WithLabelValues(s)
 		r.lastPoll.WithLabelValues(s)
 		r.failures.WithLabelValues(s)
+		r.mirror.WithLabelValues(s)
+		r.oldestOpen.WithLabelValues(s)
 	}
 	for _, k := range sinks {
-		r.deliveries.WithLabelValues(k, "ok")
-		r.deliveries.WithLabelValues(k, "error")
+		for _, res := range deliveryResults {
+			r.deliveries.WithLabelValues(k, res)
+		}
+		r.deliveryDur.WithLabelValues(k)
+		r.retries.WithLabelValues(k)
+		r.lastSuccess.WithLabelValues(k)
 	}
 }
 
 func result(err error) string {
-	if err != nil {
+	switch {
+	case err == nil:
+		return "ok"
+	case errors.Is(err, notify.ErrFiltered):
+		return "skipped"
+	default:
 		return "error"
 	}
-	return "ok"
 }
 
 func (r *Recorder) PollDone(source string, d time.Duration, failures int, err error) {
@@ -178,16 +219,37 @@ func (r *Recorder) SnapshotSeen(source string, snap *incident.Snapshot) {
 	if snap.UnresolvedCount >= 0 {
 		r.unresolved.WithLabelValues(source).Set(float64(snap.UnresolvedCount))
 	}
+	r.mirror.WithLabelValues(source).Set(b2f(snap.Mirror))
 }
 
 func (r *Recorder) EventsEmitted(source string, evs []incident.Event) {
 	for _, ev := range evs {
-		r.events.WithLabelValues(source, string(ev.Kind)).Inc()
+		r.events.WithLabelValues(source, string(ev.Kind), ev.Record.Severity.String()).Inc()
 	}
 }
 
-func (r *Recorder) Delivered(sink string, err error) {
-	r.deliveries.WithLabelValues(sink, result(err)).Inc()
+func (r *Recorder) Undelivered(source, reason string) {
+	r.undelivered.WithLabelValues(source, reason).Inc()
+}
+
+func (r *Recorder) Delivered(sink string, d time.Duration, err error) {
+	res := result(err)
+	r.deliveries.WithLabelValues(sink, res).Inc()
+	if res == "skipped" {
+		// Nothing was attempted; a zero-length observation would drag the
+		// latency histogram toward a number no relay ever produced.
+		return
+	}
+	r.deliveryDur.WithLabelValues(sink).Observe(d.Seconds())
+	if err == nil {
+		r.lastSuccess.WithLabelValues(sink).Set(float64(r.now().Unix()))
+	}
+}
+
+// Retried is the notify.OnRetry hook; it is not part of poller.Observer
+// because retries happen inside the sink, below the poller's view.
+func (r *Recorder) Retried(sink string) {
+	r.retries.WithLabelValues(sink).Inc()
 }
 
 func (r *Recorder) StateApplied(source string, st poller.State) {
@@ -200,6 +262,11 @@ func (r *Recorder) StateApplied(source string, st poller.State) {
 	if !st.LastComplete.IsZero() {
 		r.lastComplete.WithLabelValues(source).Set(float64(st.LastComplete.Unix()))
 	}
+	oldest := 0.0
+	if !st.OldestOpen.IsZero() {
+		oldest = float64(st.OldestOpen.Unix())
+	}
+	r.oldestOpen.WithLabelValues(source).Set(oldest)
 }
 
 func (r *Recorder) SelfChecked(source string, err error) {

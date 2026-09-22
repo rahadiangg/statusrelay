@@ -43,6 +43,7 @@ type Notifier struct {
 	base     string
 	http     *http.Client
 	ua       string
+	render   notify.Renderer
 }
 
 // Option configures a Notifier.
@@ -59,6 +60,10 @@ func WithHTTPClient(c *http.Client) Option { return func(n *Notifier) { n.http =
 
 // WithUserAgent sets the User-Agent header.
 func WithUserAgent(ua string) Option { return func(n *Notifier) { n.ua = ua } }
+
+// WithRenderer sets how events are turned into text (timezone, provider
+// names). The zero Renderer is UTC with raw source ids.
+func WithRenderer(r notify.Renderer) Option { return func(n *Notifier) { n.render = r } }
 
 // New builds a Notifier. name is the instance label, token the bot token and
 // chatID the numeric chat id or @channelusername.
@@ -106,7 +111,7 @@ type apiResponse struct {
 // Send posts one message. Errors never contain the request URL: the bot token
 // is part of the path, and net/http's *url.Error prints the URL verbatim.
 func (n *Notifier) Send(ctx context.Context, ev incident.Event) error {
-	m := notify.Render(ev)
+	m := n.render.Render(ev)
 	body, err := json.Marshal(sendMessage{
 		ChatID:                n.chatID,
 		Text:                  truncate(m.Subject+"\n\n"+m.Body, maxTextRunes),

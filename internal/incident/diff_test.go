@@ -113,6 +113,27 @@ func TestDiffNewIncidentInWatchedRegion(t *testing.T) {
 	}
 }
 
+// The event carries the watched subset of the scope, so a subject line can
+// say "AP-Jakarta" when the provider listed five regions.
+func TestDiffEventCarriesWatchedScope(t *testing.T) {
+	o := opts()
+	got := Diff(nil, snapshot([]Record{build("13", withRegions("ap-southeast-3", "ap-southeast-4"))}, nil), o)
+	wantKinds(t, got, KindNew)
+	if len(got[0].Watched) != 1 || got[0].Watched[0].RegionCode != "ap-southeast-4" {
+		t.Errorf("Watched: got %v, want only ap-southeast-4", got[0].Watched)
+	}
+	if len(got[0].Record.Scope) != 2 {
+		t.Errorf("Record.Scope was trimmed to %d; the full provider scope must survive", len(got[0].Record.Scope))
+	}
+	// A global event has nothing to match but Watched must still be non-nil,
+	// which is how a renderer tells "no region of ours" from "no filter".
+	g := Diff(nil, snapshot([]Record{build("14", func(r *Record) { r.Global, r.Scope = true, nil })}, nil), o)
+	wantKinds(t, g, KindNew)
+	if g[0].Watched == nil {
+		t.Error("Watched is nil for a global event; want empty non-nil")
+	}
+}
+
 func TestDiffIgnoresUnwatchedRegion(t *testing.T) {
 	o := opts()
 	got := Diff(nil, snapshot([]Record{build("13", withRegions("ap-southeast-3"))}, nil), o)

@@ -88,6 +88,12 @@ type Snapshot struct {
 
 	// Warnings are non-fatal anomalies worth a metric but not worth failing on.
 	Warnings []Warning
+
+	// Mirror is true when this snapshot was served by the adapter's fallback
+	// host rather than its primary. The data is meant to be identical, but a
+	// primary that is silently blocked for weeks is worth a gauge: it is the
+	// first sign the adapter is one outage away from blind.
+	Mirror bool
 }
 
 // Warning is a typed anomaly. Kind is a low-cardinality label, safe for metrics.
@@ -292,6 +298,13 @@ type Record struct {
 
 	Scope   []Scope
 	Updates []Update
+
+	// URL is the provider's public page for this record, or the status site
+	// root when the provider has no per-incident page. Empty only for events
+	// that have no upstream at all (statusrelay's own health transitions).
+	// It is for humans and never fetched; providers may change the pattern
+	// and a stale link is an inconvenience, not a false alarm.
+	URL string
 
 	HasReport bool
 	// RawReport is opaque on purpose. On the upstream this was built against no

@@ -70,18 +70,31 @@ func ThreadID(k incident.Key) string {
 // permanent error or a cancelled ctx stops immediately; the last error is
 // returned wrapped, never swallowed — an alert that could not be delivered
 // must be visible to whoever reads the logs.
-func WithRetry(n Notifier, clk clock.Clock, attempts int, base time.Duration) Notifier {
+func WithRetry(n Notifier, clk clock.Clock, attempts int, base time.Duration, opts ...RetryOption) Notifier {
 	if attempts < 1 {
 		attempts = 1
 	}
-	return &retrier{n: n, clk: clk, attempts: attempts, base: base}
+	r := &retrier{n: n, clk: clk, attempts: attempts, base: base}
+	for _, o := range opts {
+		o(r)
+	}
+	return r
 }
+
+// RetryOption configures WithRetry.
+type RetryOption func(*retrier)
+
+// OnRetry is called with the sink name each time a failed attempt is about
+// to be retried. A delivery that succeeds on its third try reports "ok"; this
+// is how a flapping relay stays visible.
+func OnRetry(f func(sink string)) RetryOption { return func(r *retrier) { r.onRetry = f } }
 
 type retrier struct {
 	n        Notifier
 	clk      clock.Clock
 	attempts int
 	base     time.Duration
+	onRetry  func(sink string)
 }
 
 func (r *retrier) Name() string { return r.n.Name() }
@@ -96,6 +109,9 @@ func (r *retrier) Send(ctx context.Context, ev incident.Event) error {
 		last = err
 		if !errors.Is(err, ErrTransient) || attempt == r.attempts-1 {
 			break
+		}
+		if r.onRetry != nil {
+			r.onRetry(r.n.Name())
 		}
 		wait := r.base * time.Duration(1<<attempt)
 		var rl *RateLimited

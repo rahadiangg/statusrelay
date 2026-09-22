@@ -102,7 +102,7 @@ func TestSendRequestShape(t *testing.T) {
 	if !c.body.DisableWebPagePreview {
 		t.Error("disable_web_page_preview not set")
 	}
-	if !strings.HasPrefix(c.body.Text, "[statusrelay] NEW major: Abnormal accounts in AP-Jakarta\n\nNEW · major") {
+	if !strings.HasPrefix(c.body.Text, "[statusrelay] NEW major · huawei-intl · AP-Jakarta\n\nNEW · major") {
 		t.Errorf("unexpected text:\n%s", c.body.Text)
 	}
 }

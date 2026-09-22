@@ -42,6 +42,53 @@ backoff (`notify.retry`); a `429` `Retry-After` overrides the backoff.
 `notify.log_only: true` logs every event instead of sending — use it on
 first deploy.
 
+### Routing
+
+Each sink takes three optional keys. Absent means no restriction, so a
+config with none routes everything everywhere.
+
+```yaml
+telegram:
+  - name: oncall
+    chat_id: "-100…"
+    token_env: STATUSRELAY_TELEGRAM_TOKEN
+    min_severity: major                  # info | minor | major | critical
+    kinds: [new, resolved, source_blind] # exact, lower-case
+    sources: [huawei-intl]               # source ids
+```
+
+Unknown severities always pass a floor. An explicitly empty list is a
+config error, and **every source must have at least one sink that accepts
+its `source_blind` event** or statusrelay refuses to start — a feed that
+dies unnoticed is the failure this tool exists to catch. Events a sink's
+route skips count as `deliveries_total{result="skipped"}`; an event no
+sink accepts counts in `events_undelivered_total`.
+
+### Message format
+
+```
+Subject: [statusrelay] NEW major · Huawei Cloud · AP-Jakarta (IAM, ECS)
+
+NEW · major · Huawei Cloud (huawei-intl #13)
+<provider title>
+Details: https://status.service.huaweicloud.com/intl/
+Status: open
+Published: 2026-07-26 02:05 WIB
+Watched: AP-Jakarta (IAM, ECS)
+All regions: AP-Jakarta (IAM, ECS); AP-Singapore (IAM, ECS)
+
+Update 2026-07-26 02:05 WIB:
+  <only the new progress entries, never the full history>
+```
+
+The subject names the transition, the provider and *your* regions (capped
+at three), never the provider's title. `Watched:` appears only when it is
+narrower than `All regions:`. Timestamps use `notify.timezone` (IANA name,
+default `UTC`); `sources[].display_name` overrides the per-kind default
+(`Huawei Cloud`, `Alibaba Cloud`, `Tencent Cloud`). `Details:` links the
+provider's own bulletin where one exists (Alibaba); Huawei and Tencent have
+no per-incident page, so it links to their status dashboards.
+
 ### Webhook payload
 
 Headers: `X-Statusrelay-Event-Id`, `X-Statusrelay-Event-Kind`, and, when a
@@ -57,6 +104,7 @@ Redirects are refused; give the final URL.
   "severity": "major", "raw_severity": "…", "status": "open",
   "started_at": "2026-09-21T07:00:00Z", "updated_at": null, "ended_at": null,
   "global": false,
+  "url": "https://status.service.huaweicloud.com/intl/",
   "scope": [{"region_code": "ap-southeast-4", "region_name": "AP-Jakarta",
              "services": [{"abbr": "ECS", "name": "Elastic Cloud Server"}]}],
   "new_updates": [{"at": "2026-09-21T07:05:00Z", "text": "…", "lang": "en"}],
@@ -107,6 +155,15 @@ re-announced on restart. Secrets come from the environment, never the file.
 There is no `HEALTHCHECK`; point your orchestrator at `GET /healthz`
 (liveness: 503 when the poll loop has stalled) and `GET /readyz`
 (readiness: 503 while any source is blind). Metrics: `GET /metrics`.
+
+Metrics worth alerting on, all prefixed `statusrelay_`: `source_blind`,
+`time() - last_complete_snapshot_timestamp_seconds`,
+`events_undelivered_total`, `time() - last_delivery_success_timestamp_seconds`
+(a dead sink before an incident), `delivery_retries_total` (a flapping
+relay), `source_using_mirror`, and
+`time() - oldest_open_incident_started_timestamp_seconds`. `events_total`
+carries `kind` and `severity`; `deliveries_total` carries `ok`, `error` or
+`skipped`; `delivery_duration_seconds` is a histogram per sink.
 
 ## Configure
 

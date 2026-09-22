@@ -25,6 +25,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/rahadiangg/statusrelay/internal/incident"
+	"github.com/rahadiangg/statusrelay/internal/notify"
 )
 
 // Config is the fully resolved, validated configuration.
@@ -61,9 +62,19 @@ type Source struct {
 	MinSeverity   string   `yaml:"min_severity"`
 	PreferLang    string   `yaml:"prefer_lang"`
 	AllowNonIntl  bool     `yaml:"allow_non_intl"`
+	// DisplayName is what notifications call this source ("Huawei Cloud").
+	// Defaults from kind; set it when two sources share a kind.
+	DisplayName string `yaml:"display_name"`
 
 	// Resolved by Validate.
 	Severity incident.Severity `yaml:"-"`
+}
+
+// displayNames are the defaults per kind.
+var displayNames = map[string]string{
+	"huawei":  "Huawei Cloud",
+	"alibaba": "Alibaba Cloud",
+	"tencent": "Tencent Cloud",
 }
 
 // Region is one watched region. Name is optional; when every region has one,
@@ -78,9 +89,60 @@ type Region struct {
 type Notify struct {
 	LogOnly  bool       `yaml:"log_only"`
 	Retry    Retry      `yaml:"retry"`
+	Timezone string     `yaml:"timezone"` // IANA name; "" means UTC
 	Telegram []Telegram `yaml:"telegram"`
 	SMTP     []SMTP     `yaml:"smtp"`
 	Webhook  []Webhook  `yaml:"webhook"`
+
+	Location *time.Location `yaml:"-"` // resolved from Timezone
+}
+
+// Route is a sink's filter. Every field is optional and an absent field
+// means "no restriction", so a config written for v0.1 routes everything
+// everywhere exactly as it did. An explicitly empty list is rejected rather
+// than read as "nothing": a sink that silently never fires is the trap.
+type Route struct {
+	MinSeverity string   `yaml:"min_severity"` // info | minor | major | critical
+	Kinds       []string `yaml:"kinds"`        // event kinds, exact and lower-case
+	Sources     []string `yaml:"sources"`      // source ids
+
+	Severity incident.Severity `yaml:"-"` // resolved from MinSeverity
+}
+
+// Filter converts the validated route into the notify package's form.
+func (r Route) Filter() notify.Filter {
+	f := notify.Filter{MinSeverity: r.Severity}
+	if len(r.Kinds) > 0 {
+		f.Kinds = make(map[incident.EventKind]bool, len(r.Kinds))
+		for _, k := range r.Kinds {
+			f.Kinds[incident.EventKind(k)] = true
+		}
+	}
+	if len(r.Sources) > 0 {
+		f.Sources = make(map[string]bool, len(r.Sources))
+		for _, s := range r.Sources {
+			f.Sources[s] = true
+		}
+	}
+	return f
+}
+
+// String is the one-line form check-config prints.
+func (r Route) String() string {
+	if r.Filter().Empty() {
+		return "all events"
+	}
+	var parts []string
+	if r.Severity != incident.SeverityUnknown {
+		parts = append(parts, "severity >= "+r.Severity.String())
+	}
+	if len(r.Kinds) > 0 {
+		parts = append(parts, "kinds "+fmt.Sprint(r.Kinds))
+	}
+	if len(r.Sources) > 0 {
+		parts = append(parts, "sources "+fmt.Sprint(r.Sources))
+	}
+	return strings.Join(parts, ", ")
 }
 
 // Retry is the shared per-sink retry policy.
@@ -95,6 +157,7 @@ type Telegram struct {
 	ChatID   string `yaml:"chat_id"`
 	TokenEnv string `yaml:"token_env"`
 	ThreadID int64  `yaml:"thread_id"`
+	Route    `yaml:",inline"`
 
 	Token string `yaml:"-"` // resolved from TokenEnv
 }
@@ -107,6 +170,7 @@ type SMTP struct {
 	To          []string `yaml:"to"`
 	Username    string   `yaml:"username"`
 	PasswordEnv string   `yaml:"password_env"`
+	Route       `yaml:",inline"`
 
 	Password string `yaml:"-"` // resolved from PasswordEnv
 }
@@ -117,6 +181,7 @@ type Webhook struct {
 	URL       string            `yaml:"url"`
 	SecretEnv string            `yaml:"secret_env"`
 	Headers   map[string]string `yaml:"headers"`
+	Route     `yaml:",inline"`
 
 	Secret string `yaml:"-"` // resolved from SecretEnv
 }
@@ -270,10 +335,20 @@ func (c *Config) validate() error {
 		if s.PreferLang == "" {
 			s.PreferLang = "en"
 		}
+		if strings.TrimSpace(s.DisplayName) == "" {
+			s.DisplayName = displayNames[s.Kind]
+		}
 	}
 
-	if err := c.Notify.validate(); err != nil {
+	if err := c.Notify.validate(ids); err != nil {
 		errs = append(errs, err)
+	}
+	if !c.Notify.LogOnly {
+		for _, s := range c.Sources {
+			if !c.Notify.coversBlind(s.ID) {
+				bad("notify: no sink would receive a source_blind event for %s (every sink's route excludes it); statusrelay refuses to run where nobody is told the feed is dead", s.ID)
+			}
+		}
 	}
 	if c.HTTP.Listen != "" {
 		if _, _, err := net.SplitHostPort(c.HTTP.Listen); err != nil {
@@ -360,7 +435,7 @@ func (s Source) Filter() incident.Filter {
 	return f
 }
 
-func (n *Notify) validate() error {
+func (n *Notify) validate(sourceIDs map[string]bool) error {
 	var errs []error
 	bad := func(format string, a ...any) { errs = append(errs, fmt.Errorf(format, a...)) }
 
@@ -370,6 +445,14 @@ func (n *Notify) validate() error {
 	if n.Retry.Backoff < 0 {
 		bad("notify.retry.backoff must not be negative")
 	}
+	if n.Timezone == "" {
+		n.Timezone = "UTC"
+	}
+	loc, err := time.LoadLocation(n.Timezone)
+	if err != nil {
+		bad("notify.timezone %q: %v (use an IANA name such as Asia/Jakarta)", n.Timezone, err)
+	}
+	n.Location = loc
 	total := len(n.Telegram) + len(n.SMTP) + len(n.Webhook)
 	if total == 0 && !n.LogOnly {
 		bad("notify: no transports configured; add telegram/smtp/webhook or set notify.log_only: true to run without alerts")
@@ -386,7 +469,13 @@ func (n *Notify) validate() error {
 		}
 		names[nm] = true
 	}
-	for _, t := range n.Telegram {
+	route := func(kind, nm string, r *Route) {
+		if err := r.validate(sourceIDs); err != nil {
+			bad("notify.%s.%s: %v", kind, nm, err)
+		}
+	}
+	for i := range n.Telegram {
+		t := &n.Telegram[i]
 		name("telegram", t.Name)
 		if strings.TrimSpace(t.ChatID) == "" {
 			bad("notify.telegram.%s: chat_id is required", t.Name)
@@ -394,8 +483,10 @@ func (n *Notify) validate() error {
 		if t.TokenEnv == "" {
 			bad("notify.telegram.%s: token_env is required", t.Name)
 		}
+		route("telegram", t.Name, &t.Route)
 	}
-	for _, s := range n.SMTP {
+	for i := range n.SMTP {
+		s := &n.SMTP[i]
 		name("smtp", s.Name)
 		if s.Addr == "" || s.From == "" || len(s.To) == 0 {
 			bad("notify.smtp.%s: addr, from and to are required", s.Name)
@@ -403,12 +494,81 @@ func (n *Notify) validate() error {
 		if (s.Username == "") != (s.PasswordEnv == "") {
 			bad("notify.smtp.%s: username and password_env must be set together", s.Name)
 		}
+		route("smtp", s.Name, &s.Route)
 	}
-	for _, w := range n.Webhook {
+	for i := range n.Webhook {
+		w := &n.Webhook[i]
 		name("webhook", w.Name)
 		if w.URL == "" {
 			bad("notify.webhook.%s: url is required", w.Name)
 		}
+		route("webhook", w.Name, &w.Route)
 	}
 	return errors.Join(errs...)
+}
+
+// validate resolves the severity and rejects anything that would silently
+// route nowhere: an unknown kind, an unknown source id, or an empty list.
+func (r *Route) validate(sourceIDs map[string]bool) error {
+	var errs []error
+	if r.MinSeverity != "" {
+		sev, ok := incident.ParseSeverity(r.MinSeverity)
+		if !ok || sev == incident.SeverityUnknown {
+			errs = append(errs, fmt.Errorf("min_severity %q is not one of info, minor, major, critical", r.MinSeverity))
+		}
+		r.Severity = sev
+	}
+	if r.Kinds != nil && len(r.Kinds) == 0 {
+		errs = append(errs, errors.New("kinds is empty; remove the key to receive every kind"))
+	}
+	known := make(map[string]bool, len(notify.EventKinds))
+	for _, k := range notify.EventKinds {
+		known[string(k)] = true
+	}
+	for _, k := range r.Kinds {
+		if !known[k] {
+			errs = append(errs, fmt.Errorf("kinds: %q is not one of %v", k, notify.EventKinds))
+		}
+	}
+	if r.Sources != nil && len(r.Sources) == 0 {
+		errs = append(errs, errors.New("sources is empty; remove the key to receive every source"))
+	}
+	for _, s := range r.Sources {
+		if !sourceIDs[s] {
+			errs = append(errs, fmt.Errorf("sources: %q is not a configured source id", s))
+		}
+	}
+	return errors.Join(errs...)
+}
+
+// coversBlind reports whether at least one sink would deliver a source_blind
+// event for the source. It asks the real filter with the real event shape,
+// so the check cannot drift from what the poller does.
+func (n *Notify) coversBlind(sourceID string) bool {
+	ev := notify.SourceBlind(sourceID, "", time.Time{}, time.Time{})
+	for _, t := range n.Telegram {
+		if t.Filter().Accepts(ev) {
+			return true
+		}
+	}
+	for _, s := range n.SMTP {
+		if s.Filter().Accepts(ev) {
+			return true
+		}
+	}
+	for _, w := range n.Webhook {
+		if w.Filter().Accepts(ev) {
+			return true
+		}
+	}
+	return false
+}
+
+// DisplayNames maps every source id to its display name, for the renderer.
+func (c Config) DisplayNames() map[string]string {
+	out := make(map[string]string, len(c.Sources))
+	for _, s := range c.Sources {
+		out[s.ID] = s.DisplayName
+	}
+	return out
 }

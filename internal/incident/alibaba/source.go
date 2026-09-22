@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -79,6 +80,20 @@ func WithUserAgent(ua string) Option { return func(s *Source) { s.userAgent = ua
 // Accept-Language. Build the client with httpx.WithHeader for both.
 func WithHTTPClient(d doer) Option { return func(s *Source) { s.client.http = d } }
 
+// pageURL returns the public bulletin link for an event id. The site is a
+// HashRouter SPA at the API's origin: /#/eventDetail?eventId=<id>. A custom
+// base that does not end in the known API path falls back to its origin,
+// which is still the status site rather than a 404.
+func pageURL(base string) func(id string) string {
+	root := strings.TrimRight(base, "/")
+	if strings.HasSuffix(root, "/api/status") {
+		root = strings.TrimSuffix(root, "/api/status")
+	} else if u, err := url.Parse(root); err == nil && u.Host != "" {
+		root = u.Scheme + "://" + u.Host
+	}
+	return func(id string) string { return root + "/#/eventDetail?eventId=" + url.QueryEscape(id) }
+}
+
 // New builds a Source. id is the instance name, base is the API URL.
 func New(id, base string, opts ...Option) (*Source, error) {
 	if strings.TrimSpace(base) == "" {
@@ -135,7 +150,7 @@ func (s *Source) Capabilities() incident.Capabilities {
 // exists, so an empty detail is a fact about the API, not about the incident.
 func (s *Source) Fetch(ctx context.Context) (*incident.Snapshot, error) {
 	now := s.clock.Now()
-	m := &mapper{sourceID: s.id}
+	m := &mapper{sourceID: s.id, page: pageURL(s.client.base)}
 
 	openWire, openTotal, err := s.client.inProgress(ctx)
 	if err != nil {

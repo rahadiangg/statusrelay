@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -34,9 +35,15 @@ func TestInitCreatesEverySeriesAtZero(t *testing.T) {
 		{"statusrelay_polls_total", 2},
 		{"statusrelay_self_checks_total", 2},
 		{"statusrelay_snapshot_anomalies_total", len(AnomalyKinds)},
-		{"statusrelay_events_total", len(EventKinds)},
+		{"statusrelay_events_total", len(EventKinds) * 5}, // x severities
+		{"statusrelay_events_undelivered_total", 2},
 		{"statusrelay_records", 3},
-		{"statusrelay_deliveries_total", 2},
+		{"statusrelay_deliveries_total", 3},
+		{"statusrelay_delivery_duration_seconds", 1},
+		{"statusrelay_delivery_retries_total", 1},
+		{"statusrelay_last_delivery_success_timestamp_seconds", 1},
+		{"statusrelay_source_using_mirror", 1},
+		{"statusrelay_oldest_open_incident_started_timestamp_seconds", 1},
 		{"statusrelay_incidents_open", 1},
 		{"statusrelay_incidents_unknown", 1},
 		{"statusrelay_source_blind", 1},
@@ -74,6 +81,20 @@ func mustGauge(t *testing.T, reg *prometheus.Registry, name string) prometheus.C
 	return nil
 }
 
+// histogramCount returns the sample count of a single-series histogram.
+func histogramCount(reg *prometheus.Registry, name string) (uint64, error) {
+	fams, err := reg.Gather()
+	if err != nil {
+		return 0, err
+	}
+	for _, f := range fams {
+		if f.GetName() == name {
+			return f.GetMetric()[0].GetHistogram().GetSampleCount(), nil
+		}
+	}
+	return 0, fmt.Errorf("metric %s not found", name)
+}
+
 func TestScriptedSequenceExposition(t *testing.T) {
 	r, reg := newTestRecorder(t)
 	src := "huawei-intl"
@@ -81,11 +102,15 @@ func TestScriptedSequenceExposition(t *testing.T) {
 	r.SelfChecked(src, nil)
 	r.PollDone(src, 800*time.Millisecond, 0, nil)
 	r.SnapshotSeen(src, &incident.Snapshot{Complete: true, UnresolvedCount: 1})
-	r.EventsEmitted(src, []incident.Event{{Kind: incident.KindNew}, {Kind: incident.KindNew}, {Kind: notify.KindSourceBlind}})
-	r.Delivered("telegram/oncall", nil)
-	r.Delivered("telegram/oncall", errors.New("boom"))
+	major := incident.Record{Severity: incident.SeverityMajor}
+	r.EventsEmitted(src, []incident.Event{{Kind: incident.KindNew, Record: major}, {Kind: incident.KindNew, Record: major}, {Kind: notify.KindSourceBlind}})
+	r.Delivered("telegram/oncall", 300*time.Millisecond, nil)
+	r.Delivered("telegram/oncall", 4*time.Second, errors.New("boom"))
+	r.Delivered("telegram/oncall", 0, notify.ErrFiltered)
+	r.Retried("telegram/oncall")
+	r.Undelivered(src, "error")
 	r.StateApplied(src, poller.State{
-		Open: 1, Unknown: 2, Blind: true, LastComplete: testEpoch,
+		Open: 1, Unknown: 2, Blind: true, LastComplete: testEpoch, OldestOpen: testEpoch.Add(-time.Hour),
 		Records: map[incident.Status]int{incident.StatusOpen: 1, incident.StatusResolved: 5, incident.StatusUnknown: 2},
 	})
 	r.PollDone(src, 2*time.Second, 3, errors.New("timeout"))
@@ -98,10 +123,18 @@ func TestScriptedSequenceExposition(t *testing.T) {
 # HELP statusrelay_consecutive_fetch_failures Fetch failures since the last success.
 # TYPE statusrelay_consecutive_fetch_failures gauge
 statusrelay_consecutive_fetch_failures{source="huawei-intl"} 3
-# HELP statusrelay_deliveries_total Per-sink delivery attempts after retries, by result.
+# HELP statusrelay_deliveries_total Per-sink delivery outcomes after retries: ok, error, or skipped by the sink's route.
 # TYPE statusrelay_deliveries_total counter
 statusrelay_deliveries_total{result="error",sink="telegram/oncall"} 1
 statusrelay_deliveries_total{result="ok",sink="telegram/oncall"} 1
+statusrelay_deliveries_total{result="skipped",sink="telegram/oncall"} 1
+# HELP statusrelay_delivery_retries_total Retried delivery attempts. A sink that reports ok but retries every time is a flapping relay.
+# TYPE statusrelay_delivery_retries_total counter
+statusrelay_delivery_retries_total{sink="telegram/oncall"} 1
+# HELP statusrelay_events_undelivered_total Events no sink accepted: unrouted when every sink's route skipped it, error when every attempt failed. Nobody was paged.
+# TYPE statusrelay_events_undelivered_total counter
+statusrelay_events_undelivered_total{reason="error",source="huawei-intl"} 1
+statusrelay_events_undelivered_total{reason="unrouted",source="huawei-intl"} 0
 # HELP statusrelay_incidents_open Matched records the provider currently lists as open. NOT a health signal: zero also means the feed is broken. Alert on statusrelay_source_blind instead.
 # TYPE statusrelay_incidents_open gauge
 statusrelay_incidents_open{source="huawei-intl"} 1
@@ -111,9 +144,15 @@ statusrelay_incidents_unknown{source="huawei-intl"} 2
 # HELP statusrelay_last_complete_snapshot_timestamp_seconds Unix time of the last complete snapshot; 0 until the first.
 # TYPE statusrelay_last_complete_snapshot_timestamp_seconds gauge
 statusrelay_last_complete_snapshot_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
+# HELP statusrelay_last_delivery_success_timestamp_seconds Unix time of the last successful delivery per sink; 0 until the first. The only way to notice a dead sink before an incident.
+# TYPE statusrelay_last_delivery_success_timestamp_seconds gauge
+statusrelay_last_delivery_success_timestamp_seconds{sink="telegram/oncall"} 1.7899848e+09
 # HELP statusrelay_last_poll_timestamp_seconds Unix time of the last fetch attempt, successful or not.
 # TYPE statusrelay_last_poll_timestamp_seconds gauge
 statusrelay_last_poll_timestamp_seconds{source="huawei-intl"} 1.7899848e+09
+# HELP statusrelay_oldest_open_incident_started_timestamp_seconds Publication time of the longest-running matched incident still open or unknown; 0 when none. Age = time() - this.
+# TYPE statusrelay_oldest_open_incident_started_timestamp_seconds gauge
+statusrelay_oldest_open_incident_started_timestamp_seconds{source="huawei-intl"} 1.7899812e+09
 # HELP statusrelay_polls_total Fetch attempts per source, by result.
 # TYPE statusrelay_polls_total counter
 statusrelay_polls_total{result="error",source="huawei-intl"} 1
@@ -136,25 +175,38 @@ statusrelay_snapshots_incomplete_total{source="huawei-intl"} 1
 # HELP statusrelay_source_blind 1 when the source has produced no complete snapshot within stale_after. Alert when 1: until it clears, 'no incidents' means nothing.
 # TYPE statusrelay_source_blind gauge
 statusrelay_source_blind{source="huawei-intl"} 1
+# HELP statusrelay_source_using_mirror 1 when the last snapshot came from the adapter's fallback host. Always 0 for adapters without a mirror.
+# TYPE statusrelay_source_using_mirror gauge
+statusrelay_source_using_mirror{source="huawei-intl"} 0
 # HELP statusrelay_state_save_failures_total Failed writes of the state file. State stays in memory; a restart before a later save re-delivers events.
 # TYPE statusrelay_state_save_failures_total counter
 statusrelay_state_save_failures_total 1
 `
 	if err := testutil.GatherAndCompare(reg, strings.NewReader(want),
-		"statusrelay_consecutive_fetch_failures", "statusrelay_deliveries_total", "statusrelay_incidents_open",
+		"statusrelay_consecutive_fetch_failures", "statusrelay_deliveries_total", "statusrelay_delivery_retries_total",
+		"statusrelay_events_undelivered_total", "statusrelay_incidents_open",
 		"statusrelay_incidents_unknown", "statusrelay_last_complete_snapshot_timestamp_seconds",
-		"statusrelay_last_poll_timestamp_seconds", "statusrelay_polls_total", "statusrelay_provider_unresolved_count",
-		"statusrelay_records", "statusrelay_self_checks_total", "statusrelay_snapshots_incomplete_total",
-		"statusrelay_source_blind", "statusrelay_state_save_failures_total"); err != nil {
+		"statusrelay_last_delivery_success_timestamp_seconds", "statusrelay_last_poll_timestamp_seconds",
+		"statusrelay_oldest_open_incident_started_timestamp_seconds", "statusrelay_polls_total",
+		"statusrelay_provider_unresolved_count", "statusrelay_records", "statusrelay_self_checks_total",
+		"statusrelay_snapshots_incomplete_total", "statusrelay_source_blind", "statusrelay_source_using_mirror",
+		"statusrelay_state_save_failures_total"); err != nil {
 		t.Error(err)
 	}
 
 	// Vectors with many pre-initialised series: check the touched values only.
-	if got := testutil.ToFloat64(r.events.WithLabelValues(src, "new")); got != 2 {
-		t.Errorf("events new = %v, want 2", got)
+	if got := testutil.ToFloat64(r.events.WithLabelValues(src, "new", "major")); got != 2 {
+		t.Errorf("events new/major = %v, want 2", got)
 	}
-	if got := testutil.ToFloat64(r.events.WithLabelValues(src, "source_blind")); got != 1 {
-		t.Errorf("events source_blind = %v, want 1", got)
+	if got := testutil.ToFloat64(r.events.WithLabelValues(src, "source_blind", "unknown")); got != 1 {
+		t.Errorf("events source_blind/unknown = %v, want 1", got)
+	}
+	// Two attempted deliveries were timed; the skipped one must not be.
+	if got := testutil.CollectAndCount(reg, "statusrelay_delivery_duration_seconds"); got != 1 {
+		t.Errorf("delivery_duration series = %d, want 1", got)
+	}
+	if got, err := histogramCount(reg, "statusrelay_delivery_duration_seconds"); err != nil || got != 2 {
+		t.Errorf("delivery_duration observations = %d (%v), want 2", got, err)
 	}
 	if got := testutil.ToFloat64(r.anomalies.WithLabelValues(src, incident.AnomalyCountMismatch)); got != 2 {
 		t.Errorf("anomalies count_mismatch = %v, want 2", got)
