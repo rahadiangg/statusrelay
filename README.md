@@ -152,6 +152,19 @@ linux/arm64, distroless, uid 65532, no shell. Config is read from
 written under `/data` — mount a volume there or every open incident is
 re-announced on restart. Secrets come from the environment, never the file.
 
+### Try it: statusrelay + Prometheus + Grafana
+
+```sh
+docker compose -f examples/docker-compose/compose.yaml up -d
+open http://localhost:3000/d/statusrelay
+```
+
+Polls Huawei, Alibaba and Tencent for Jakarta with `notify.log_only`, so
+nobody is paged. The dashboard (`examples/docker-compose/grafana/dashboards/statusrelay.json`)
+also imports into an existing Grafana: pick your Prometheus in its
+`datasource` variable. Its top row is feed trust, not incident count — zero
+open incidents means nothing while a source is blind.
+
 There is no `HEALTHCHECK`; point your orchestrator at `GET /healthz`
 (liveness: 503 when the poll loop has stalled) and `GET /readyz`
 (readiness: 503 while any source is blind). Metrics: `GET /metrics`.

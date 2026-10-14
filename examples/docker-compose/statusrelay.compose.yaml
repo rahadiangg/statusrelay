@@ -1,0 +1,24 @@
+# Config for compose.yaml: real upstreams, Jakarta on all three providers,
+# nobody paged. For every key and what it guards against, see
+# ../../statusrelay.example.yaml.
+#
+# To see the Delivery row fill, replace log_only with a sink, e.g. a webhook
+# pointed at https://webhook.site, and restart the statusrelay service.
+state_file: /data/statusrelay-state.json
+sources:
+  - id: huawei-intl
+    kind: huawei
+    regions:
+      - {code: ap-southeast-4, name: AP-Jakarta}     # NOT -3: that is Singapore
+  - id: alibaba-intl
+    kind: alibaba
+    regions:
+      - {code: ap-southeast-5, name: "Indonesia (Jakarta)"}
+  - id: tencent-intl
+    kind: tencent
+    regions:
+      - {code: ap-jakarta, name: Jakarta}
+http:
+  listen: ":9101"
+notify:
+  log_only: true
